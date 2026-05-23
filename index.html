@@ -2,178 +2,181 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>資產監控</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>資產監控與績效財務管理系統 - 終極美化版</title>
     <style>
+        /* 預設深色主題變數 */
         :root {
-            --bg-color: #0d0e12;
-            --card-bg: #16181d;
-            --panel-bg: #1e222b;
+            --bg-color: #0d0e12;         
+            --card-bg: #16181d;          
+            --panel-bg: #1e222b;         
             --text-color: #f1f1f1;
-            --text-secondary: #9aa2b5;
+            --text-secondary: #9aa2b5; 
             --primary-blue: #2979ff;
             --primary-glow: rgba(41, 121, 255, 0.2);
             --border-color: #2a2e39;
             --input-bg: #0d0e12;
             --hover-bg: rgba(255, 255, 255, 0.05);
-            --bull-color: #ff4d4f;
-            --bear-color: #00e676;
+            --bull-color: #ff4d4f;       
+            --bear-color: #00e676;  
             --modal-overlay: rgba(0, 0, 0, 0.7);
         }
+
+        /* 淺色 (明亮) 主題變數 */
         [data-theme="light"] {
-            --bg-color: #f3f4f6;
-            --card-bg: #ffffff;
-            --panel-bg: #ffffff;
+            --bg-color: #f3f4f6;         
+            --card-bg: #ffffff;          
+            --panel-bg: #ffffff;         
             --text-color: #111827;
-            --text-secondary: #6b7280;
+            --text-secondary: #6b7280; 
             --primary-blue: #2563eb;
             --primary-glow: rgba(37, 99, 235, 0.2);
             --border-color: #e5e7eb;
             --input-bg: #f9fafb;
             --hover-bg: rgba(0, 0, 0, 0.05);
-            --bull-color: #ef4444;
-            --bear-color: #10b981;
+            --bull-color: #ef4444;       
+            --bear-color: #10b981; 
             --modal-overlay: rgba(0, 0, 0, 0.4);
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.3s, border-color 0.3s; }
-        
-        /* 增加 overflow-x: hidden 防止手機端左右滑動 */
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 12px; font-size: 16px; overflow-x: hidden; }
-        @media (min-width: 768px) { body { padding: 20px; } }
 
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.3s, border-color 0.3s; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; font-size: 16px; }
+
+        /* 主題切換按鈕 */
         .theme-toggle-btn { background: var(--panel-bg); border: 1px solid var(--border-color); color: var(--text-color); font-size: 20px; padding: 8px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .theme-toggle-btn:hover { border-color: var(--primary-blue); transform: translateY(-2px); }
-        .control-panel { background-color: var(--panel-bg); border-radius: 12px; padding: 20px; margin-bottom: 24px; border: 1px solid var(--border-color); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+
+        .control-panel { background-color: var(--panel-bg); border-radius: 12px; padding: 24px; margin-bottom: 24px; border: 1px solid var(--border-color); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+        
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 16px; }
-        .header-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        .header-left h2 { font-size: 22px; letter-spacing: 1px; margin: 0; }
-        .counter { background-color: rgba(41, 121, 255, 0.15); color: var(--primary-blue); padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; border: 1px solid rgba(41, 121, 255, 0.3); }
-        .group-controls { display: flex; gap: 10px; flex-wrap: wrap; }
-        .group-item { display: flex; align-items: stretch; background: var(--bg-color); border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); flex: 1 1 auto; justify-content: center; }
-        .group-btn { background: transparent; color: var(--text-color); border: none; padding: 10px 14px; font-size: 15px; cursor: pointer; font-weight: bold; transition: 0.2s; width: 100%; }
+        .header-left { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+        .header-left h2 { font-size: 24px; letter-spacing: 1px; margin: 0; }
+        .counter { background-color: rgba(41, 121, 255, 0.15); color: var(--primary-blue); padding: 8px 16px; border-radius: 20px; font-size: 16px; font-weight: bold; border: 1px solid rgba(41, 121, 255, 0.3); }
+        
+        /* 群組按鈕樣式設計 */
+        .group-controls { display: flex; gap: 12px; flex-wrap: wrap; }
+        .group-item { display: flex; align-items: stretch; background: var(--bg-color); border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); }
+        .group-btn { background: transparent; color: var(--text-color); border: none; padding: 10px 18px; font-size: 16px; cursor: pointer; font-weight: bold; transition: 0.2s; }
         .group-btn:hover { background: var(--primary-glow); color: var(--primary-blue); }
         .group-edit-btn { background: transparent; color: var(--text-secondary); border: none; border-left: 1px solid var(--border-color); padding: 0 10px; cursor: pointer; transition: 0.2s; }
         .group-edit-btn:hover { color: var(--primary-blue); background: var(--hover-bg); }
-        .group-save-btn { background: var(--panel-bg); color: var(--text-color); border: none; border-left: 1px solid var(--border-color); padding: 10px 12px; font-size: 16px; cursor: pointer; transition: 0.2s; font-weight: bold;}
+        .group-save-btn { background: var(--panel-bg); color: var(--text-color); border: none; border-left: 1px solid var(--border-color); padding: 10px 14px; font-size: 16px; cursor: pointer; transition: 0.2s; font-weight: bold;}
         .group-save-btn:hover { background: var(--hover-bg); color: var(--bear-color); }
-        
-        /* 搜尋區塊手機自適應 */
-        .search-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .search-group { display: flex; flex-direction: column; gap: 8px; position: relative; }
+
+        .search-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+        .search-group { display: flex; flex-direction: column; gap: 10px; position: relative; }
         .search-group:focus-within { z-index: 900; }
-        .search-group label { font-size: 15px; color: var(--text-secondary); font-weight: 600; letter-spacing: 0.5px; }
-        .input-wrapper { position: relative; width: 100%; }
-        .search-input { width: 100%; padding: 12px 14px; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 8px; font-size: 15px; outline: none; transition: all 0.2s ease; font-weight: 500; }
-        .search-input:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 3px var(--primary-glow); }
-        .dropdown-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; max-height: 250px; overflow-y: auto; z-index: 1000; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .dropdown-item { padding: 12px 14px; cursor: pointer; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .dropdown-item:hover { background: var(--hover-bg); }
-        .item-id { color: var(--text-secondary); font-size: 13px; font-family: monospace; }
-        .item-name { font-size: 15px; font-weight: bold; }
+        .search-group label { font-size: 16px; color: var(--text-secondary); font-weight: 600; letter-spacing: 0.5px; }
         
-        /* 輸入框折疊適應 */
-        .cost-inputs-row { display: flex; gap: 8px; margin-top: 4px; align-items: center; flex-wrap: wrap; }
-        .trade-type-select { padding: 10px; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 6px; font-size: 15px; outline: none; cursor: pointer; font-weight: bold; flex-shrink: 0; }
+        .input-wrapper { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 14px 16px; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 8px; font-size: 16px; outline: none; transition: all 0.2s ease; font-weight: 500; }
+        .search-input:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 3px var(--primary-glow); }
+        
+        .dropdown-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; max-height: 250px; overflow-y: auto; z-index: 1000; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .dropdown-item { padding: 14px 16px; cursor: pointer; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .dropdown-item:hover { background: var(--hover-bg); }
+        .item-id { color: var(--text-secondary); font-size: 14px; font-family: monospace; }
+        .item-name { font-size: 16px; font-weight: bold; }
+        
+        .cost-inputs-row { display: flex; gap: 8px; margin-top: 4px; align-items: center; }
+        .trade-type-select { padding: 10px 12px; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 6px; font-size: 15px; outline: none; cursor: pointer; font-weight: bold; flex-shrink: 0; }
         .trade-type-select.buy { color: var(--bull-color); }
         .trade-type-select.sell { color: var(--bear-color); }
-        .cost-field { flex: 1; min-width: 80px; padding: 10px 12px; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 6px; font-size: 15px; outline: none; transition: 0.2s; }
+        .cost-field { flex: 1; min-width: 0; padding: 10px 14px; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 6px; font-size: 15px; outline: none; transition: 0.2s; }
         .cost-field:focus { border-color: var(--primary-blue); background: var(--input-bg); }
-        .action-btn { flex-shrink: 0; background: var(--primary-blue); color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 15px; transition: 0.2s; white-space: nowrap; }
+        
+        .action-btn { flex-shrink: 0; background: var(--primary-blue); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 15px; transition: 0.2s; white-space: nowrap; }
         .action-btn:hover { filter: brightness(1.1); }
         .action-btn:active { transform: scale(0.95); }
+
+        .charts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 24px; }
+        @media (max-width: 1200px) { .charts-grid { grid-template-columns: 1fr; } }
+
+        .chart-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; position: relative; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         
-        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 24px; }
-        .chart-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; position: relative; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 100%; }
-        .chart-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 16px 20px 10px 20px; gap: 12px; }
+        .chart-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 20px 24px 10px 24px; gap: 12px; }
         .header-left-zone { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
         .title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .chart-title { font-size: 18px; font-weight: 600; color: var(--text-color); }
-        .chart-badge { background: var(--bg-color); color: var(--text-secondary); font-size: 13px; padding: 4px 8px; border-radius: 6px; font-family: monospace; border: 1px solid var(--border-color); }
-        .header-right-zone { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+        .chart-title { font-size: 20px; font-weight: 600; color: var(--text-color); }
+        .chart-badge { background: var(--bg-color); color: var(--text-secondary); font-size: 14px; padding: 4px 8px; border-radius: 6px; font-family: monospace; border: 1px solid var(--border-color); }
+        
+        .header-right-zone { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; shrink: 0; }
         .btn-row { display: flex; align-items: center; gap: 12px; }
-        .remove-btn { background: none; border: none; color: var(--text-secondary); font-size: 20px; cursor: pointer; font-weight: bold; }
+        .remove-btn { background: none; border: none; color: var(--text-secondary); font-size: 22px; cursor: pointer; font-weight: bold; }
         .remove-btn:hover { color: var(--bull-color); }
-        .header-pnl-box { font-size: 14px; font-weight: bold; padding: 6px 10px; border-radius: 6px; background: rgba(128, 128, 128, 0.05); border: 1px solid var(--border-color); text-align: right; }
+        
+        .header-pnl-box { font-size: 16px; font-weight: bold; padding: 8px 14px; border-radius: 6px; background: rgba(128, 128, 128, 0.05); border: 1px solid var(--border-color); text-align: right; }
         .header-pnl-box.earn { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); }
         .header-pnl-box.loss { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); }
         .pnl-text-up { color: var(--bull-color); }
         .pnl-text-down { color: var(--bear-color); }
-        .info-panel { display: flex; flex-wrap: wrap; gap: 12px; font-size: 14px; font-weight: 500; padding: 8px 20px 12px 20px; border-bottom: 1px solid var(--border-color); }
-        .info-item { display: flex; gap: 4px; color: var(--text-secondary); align-items: center; }
-        .info-val { color: var(--text-color); font-family: monospace; font-size: 14px; }
-        .ma-legend { display: flex; gap: 12px; font-size: 13px; padding: 10px 20px; font-weight: bold; color: var(--text-secondary); flex-wrap: wrap; }
-        .ma-item { display: flex; align-items: center; gap: 4px; }
-        .ma-box { width: 12px; height: 6px; border-radius: 3px; }
-        .chart-container { width: 100%; height: 320px; position: relative; cursor: crosshair; }
-        .x-axis-controls { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: var(--bg-color); border-top: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px; }
-        .time-selector { display: flex; gap: 0; background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; width: 100%; }
-        .time-btn { flex: 1; background: transparent; border: none; border-right: 1px solid var(--border-color); color: var(--text-secondary); padding: 8px 10px; font-size: 14px; cursor: pointer; font-weight: 500; transition: 0.2s; text-align: center; }
-        .time-btn:last-child { border-right: none; }
+
+        .info-panel { display: flex; flex-wrap: wrap; gap: 18px; font-size: 15px; font-weight: 500; padding: 8px 24px 12px 24px; border-bottom: 1px solid var(--border-color); }
+        .info-item { display: flex; gap: 6px; color: var(--text-secondary); align-items: center; }
+        .info-val { color: var(--text-color); font-family: monospace; font-size: 16px; }
+        
+        .ma-legend { display: flex; gap: 16px; font-size: 14px; padding: 10px 24px; font-weight: bold; color: var(--text-secondary); }
+        .ma-item { display: flex; align-items: center; gap: 6px; }
+        .ma-box { width: 14px; height: 6px; border-radius: 3px; }
+        .chart-container { width: 100%; height: 380px; position: relative; cursor: crosshair; }
+        
+        .x-axis-controls { display: flex; justify-content: space-between; align-items: center; padding: 14px 24px; background: var(--bg-color); border-top: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px; }
+        .time-selector { display: flex; gap: 0; background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; }
+        .time-btn { background: transparent; border: none; border-right: 1px solid var(--border-color); color: var(--text-secondary); padding: 10px 18px; font-size: 15px; cursor: pointer; font-weight: 500; transition: 0.2s; }
         .time-btn:hover { background: var(--hover-bg); color: var(--text-color); }
         .time-btn.active { background: var(--primary-glow); color: var(--primary-blue); font-weight: bold; }
-        .custom-date-container { display: flex; align-items: center; gap: 6px; width: 100%; justify-content: space-between; }
-        .date-input { flex: 1; background: var(--panel-bg); border: 1px solid var(--border-color); color: var(--text-color); padding: 8px 10px; border-radius: 6px; outline: none; font-size: 14px; color-scheme: dark light; }
+        .custom-date-container { display: flex; align-items: center; gap: 8px; }
+        .date-input { background: var(--panel-bg); border: 1px solid var(--border-color); color: var(--text-color); padding: 8px 12px; border-radius: 6px; outline: none; font-size: 15px; color-scheme: dark light; }
 
-        .dashboard-panel { background-color: var(--panel-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-        .dashboard-title { font-size: 20px; font-weight: bold; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: var(--text-color); }
-        .dashboard-content { display: grid; grid-template-columns: minmax(280px, 350px) 1fr; gap: 20px; margin-bottom: 24px; width: 100%; }
+        .dashboard-panel { background-color: var(--panel-bg); border-radius: 12px; padding: 24px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        .dashboard-title { font-size: 22px; font-weight: bold; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; color: var(--text-color); }
         
-        .summary-column { display: flex; flex-direction: column; gap: 12px; }
-        .summary-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 16px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .summary-label { font-size: 14px; color: var(--text-secondary); font-weight: bold; margin-bottom: 6px; }
-        .summary-value { font-size: 24px; font-weight: bold; font-family: monospace; }
+        /* 4. 儀表板新排版 (左右分割) */
+        .dashboard-content { display: grid; grid-template-columns: 350px 1fr; gap: 30px; margin-bottom: 28px; }
+        @media (max-width: 900px) { .dashboard-content { grid-template-columns: 1fr; } }
+        
+        /* 左側：三大卡片垂直排列 */
+        .summary-column { display: flex; flex-direction: column; gap: 16px; }
+        .summary-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .summary-label { font-size: 15px; color: var(--text-secondary); font-weight: bold; margin-bottom: 8px; }
+        .summary-value { font-size: 28px; font-weight: bold; font-family: monospace; }
+        
+        /* 右側：收益產業占比圖表 */
+        .sector-chart-panel { background: var(--card-bg); border: 1px solid var(--border-color); padding: 24px; border-radius: 10px; display: flex; flex-direction: column; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .sector-title { font-size: 18px; font-weight: bold; margin-bottom: 20px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        .sector-list { display: flex; flex-direction: column; gap: 18px; flex: 1; justify-content: center; }
+        .sector-item { display: flex; flex-direction: column; gap: 6px; }
+        .sector-info { display: flex; justify-content: space-between; font-size: 15px; font-weight: bold; }
+        .sector-val { font-family: monospace; color: var(--text-secondary); font-size: 14px; }
+        .sector-bar-bg { width: 100%; height: 12px; background: var(--bg-color); border-radius: 6px; overflow: hidden; border: 1px solid var(--border-color); }
+        .sector-bar-fill { height: 100%; border-radius: 6px; transition: width 0.8s ease-out; }
 
-        /* ===== 雙圓餅圖面板 (自適應優化) ===== */
-        .sector-chart-panel { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 10px; display: flex; flex-direction: column; box-shadow: 0 2px 10px rgba(0,0,0,0.05); width: 100%; overflow: hidden; }
-        .sector-title { font-size: 16px; font-weight: bold; margin-bottom: 16px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
-        .pie-charts-row { display: flex; flex-direction: row; gap: 0; flex: 1; }
-        .pie-col { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 0 16px; width: 100%; }
-        .pie-col:first-child { border-right: 1px solid var(--border-color); }
-        .pie-col-title { font-size: 14px; color: var(--text-secondary); font-weight: bold; margin-bottom: 12px; text-align: center; }
-        .pie-canvas-wrap { position: relative; width: 100%; max-width: 220px; height: 220px; }
-        .pie-legend { display: flex; flex-direction: column; gap: 6px; margin-top: 14px; width: 100%; }
-        .pie-legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); }
-        .pie-legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
-        .pie-empty { display: flex; align-items: center; justify-content: center; height: 180px; font-size: 14px; color: var(--text-secondary); text-align: center; }
-
-        .table-container { width: 100%; overflow-x: auto; background: var(--bg-color); border-radius: 8px; border: 1px solid var(--border-color); -webkit-overflow-scrolling: touch; }
-        .history-table { width: 100%; min-width: 600px; border-collapse: collapse; text-align: left; font-size: 14px; }
-        .history-table th { background: var(--panel-bg); color: var(--text-secondary); padding: 12px 16px; font-weight: bold; border-bottom: 2px solid var(--border-color); white-space: nowrap; }
-        .history-table td { padding: 12px 16px; border-bottom: 1px solid var(--border-color); color: var(--text-color); }
+        .table-container { width: 100%; overflow-x: auto; background: var(--bg-color); border-radius: 8px; border: 1px solid var(--border-color); }
+        .history-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 15px; }
+        .history-table th { background: var(--panel-bg); color: var(--text-secondary); padding: 16px 20px; font-weight: bold; border-bottom: 2px solid var(--border-color); }
+        .history-table td { padding: 16px 20px; border-bottom: 1px solid var(--border-color); color: var(--text-color); }
         .history-table tr:hover { background: var(--hover-bg); }
-        .badge-buy { background: rgba(255,77,79,0.15); color: var(--bull-color); padding: 4px 8px; border-radius: 6px; font-weight: bold; display: inline-block; text-align: center; border: 1px solid rgba(255,77,79,0.3); font-size: 13px; }
-        .badge-sell { background: rgba(0,230,118,0.15); color: var(--bear-color); padding: 4px 8px; border-radius: 6px; font-weight: bold; display: inline-block; text-align: center; border: 1px solid rgba(0,230,118,0.3); font-size: 13px; }
-        .action-delete-btn { background: none; border: 1px solid var(--bull-color); color: var(--bull-color); cursor: pointer; font-weight: bold; font-size: 13px; padding: 6px 12px; border-radius: 6px; transition: 0.2s; white-space: nowrap; }
-        .action-delete-btn:hover { background: var(--bull-color); color: white; }
         
-        .custom-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--modal-overlay); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; padding: 16px; }
-        .custom-modal-box { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; width: 100%; max-width: 400px; padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); transform: translateY(-20px); transition: transform 0.2s; }
+        .badge-buy { background: rgba(255,77,79,0.15); color: var(--bull-color); padding: 6px 10px; border-radius: 6px; font-weight: bold; display: inline-block; text-align: center; border: 1px solid rgba(255,77,79,0.3); }
+        .badge-sell { background: rgba(0,230,118,0.15); color: var(--bear-color); padding: 6px 10px; border-radius: 6px; font-weight: bold; display: inline-block; text-align: center; border: 1px solid rgba(0,230,118,0.3); }
+        .action-delete-btn { background: none; border: 1px solid var(--bull-color); color: var(--bull-color); cursor: pointer; font-weight: bold; font-size: 14px; padding: 8px 14px; border-radius: 6px; transition: 0.2s; }
+        .action-delete-btn:hover { background: var(--bull-color); color: white; }
+
+        /* ====== 客製化精美 Modal 彈出視窗 ====== */
+        .custom-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--modal-overlay); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
+        .custom-modal-box { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; width: 90%; max-width: 420px; padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); transform: translateY(-20px); transition: transform 0.2s; }
         .custom-modal-overlay.show { display: flex; opacity: 1; }
         .custom-modal-overlay.show .custom-modal-box { transform: translateY(0); }
-        .custom-modal-title { font-size: 18px; font-weight: bold; margin-bottom: 12px; color: var(--text-color); }
-        .custom-modal-msg { font-size: 15px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.5; }
-        .custom-modal-input { width: 100%; padding: 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-size: 15px; outline: none; margin-bottom: 20px; display: none; }
+        .custom-modal-title { font-size: 20px; font-weight: bold; margin-bottom: 12px; color: var(--text-color); }
+        .custom-modal-msg { font-size: 16px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.5; }
+        .custom-modal-input { width: 100%; padding: 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-size: 16px; outline: none; margin-bottom: 20px; display: none; }
         .custom-modal-input:focus { border-color: var(--primary-blue); }
-        .custom-modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
-        .modal-btn { padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; }
+        .custom-modal-actions { display: flex; justify-content: flex-end; gap: 12px; }
+        .modal-btn { padding: 10px 20px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; }
         .modal-btn-cancel { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); }
         .modal-btn-cancel:hover { background: var(--hover-bg); }
         .modal-btn-confirm { background: var(--primary-blue); color: #fff; }
         .modal-btn-confirm:hover { filter: brightness(1.1); }
-
-        /* ===== 手機專用 CSS 斷點 (最大寬度 768px) ===== */
-        @media (max-width: 768px) {
-            .dashboard-content { grid-template-columns: 1fr; }
-            .pie-charts-row { flex-direction: column; gap: 24px; }
-            .pie-col:first-child { border-right: none; border-bottom: 1px solid var(--border-color); padding-bottom: 24px; }
-            .pie-col { padding: 0; }
-            .action-btn { flex: 1 1 100%; } /* 手機按鈕變大，好按 */
-            .time-selector { flex-wrap: wrap; }
-            .time-btn { border-bottom: 1px solid var(--border-color); border-right: none; }
-            .time-btn:nth-child(even) { border-left: 1px solid var(--border-color); }
-            .time-btn:nth-last-child(-n+2) { border-bottom: none; }
-        }
     </style>
 </head>
 <body>
@@ -197,6 +200,7 @@
                 <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeBtn" title="切換深淺色主題">🌙 深色</button>
                 <div class="counter" id="assetCounter">已選: 0 / 4</div>
             </div>
+            
             <div class="group-controls">
                 <div class="group-item">
                     <button class="group-btn" onclick="loadGroup(1)" id="grp-name-1">群組一</button>
@@ -215,6 +219,7 @@
                 </div>
             </div>
         </div>
+        
         <div class="search-grid">
             <div class="search-group">
                 <label>📈 台股現貨個股</label>
@@ -229,6 +234,7 @@
                     <button type="button" id="btnTwStock" class="action-btn">執行</button>
                 </div>
             </div>
+            
             <div class="search-group">
                 <label>📊 台灣上市 ETF</label>
                 <div class="input-wrapper">
@@ -242,6 +248,7 @@
                     <button type="button" id="btnTwEtf" class="action-btn">執行</button>
                 </div>
             </div>
+            
             <div class="search-group">
                 <label>🌎 美股與複委託</label>
                 <div class="input-wrapper">
@@ -255,6 +262,7 @@
                     <button type="button" id="btnUsStock" class="action-btn">執行</button>
                 </div>
             </div>
+
             <div class="search-group">
                 <label>💱 外匯走勢商品</label>
                 <div class="input-wrapper">
@@ -275,6 +283,7 @@
 
     <div class="dashboard-panel">
         <div class="dashboard-title">📈 投資組合分析與歷史紀錄</div>
+        
         <div class="dashboard-content">
             <div class="summary-column">
                 <div class="summary-card">
@@ -290,24 +299,11 @@
                     <div class="summary-value" id="totalAssetPnl" style="color: var(--text-color);">$0 (0.00%)</div>
                 </div>
             </div>
-
+            
             <div class="sector-chart-panel">
                 <div class="sector-title">📊 投資組合產業/類別占比</div>
-                <div class="pie-charts-row">
-                    <div class="pie-col">
-                        <div class="pie-col-title">持倉市值占比</div>
-                        <div class="pie-canvas-wrap">
-                            <canvas id="pieValueChart" role="img" aria-label="各產業持倉市值圓形圖">各產業持倉市值占比</canvas>
-                        </div>
-                        <div class="pie-legend" id="pieValueLegend"></div>
-                    </div>
-                    <div class="pie-col">
-                        <div class="pie-col-title">獲益產業占比</div>
-                        <div class="pie-canvas-wrap">
-                            <canvas id="pieGainChart" role="img" aria-label="各產業獲益圓形圖">各產業獲益占比</canvas>
-                        </div>
-                        <div class="pie-legend" id="pieGainLegend"></div>
-                    </div>
+                <div class="sector-list" id="sectorListContainer">
+                    <div style="color: var(--text-secondary); text-align: center;">尚無持倉資料，無法分析產業佔比。</div>
                 </div>
             </div>
         </div>
@@ -331,94 +327,8 @@
     </div>
 
     <script>
-        // ====== 圓餅圖實例管理 ======
-        let pieValueInstance = null;
-        let pieGainInstance  = null;
-
-        function destroyPieCharts() {
-            if (pieValueInstance) { pieValueInstance.destroy(); pieValueInstance = null; }
-            if (pieGainInstance)  { pieGainInstance.destroy();  pieGainInstance  = null; }
-        }
-
-        function buildPieChart(canvasId, legendId, items, emptyMsg) {
-            const canvas = document.getElementById(canvasId);
-            const legendEl = document.getElementById(legendId);
-
-            if (!items || items.length === 0) {
-                legendEl.innerHTML = `<div class="pie-empty">${emptyMsg}</div>`;
-                // 清空畫布
-                const ctx = canvas.getContext('2d');
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                return null;
-            }
-
-            const total = items.reduce((s, i) => s + i.value, 0);
-            const labels = items.map(i => i.name);
-            const data   = items.map(i => i.value);
-            const colors = items.map(i => i.color);
-
-            const instance = new Chart(canvas, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: colors,
-                        borderColor: 'transparent',
-                        hoverOffset: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '60%',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(ctx) {
-                                    const pct = ((ctx.parsed / total) * 100).toFixed(1);
-                                    return ` ${ctx.label}: ${pct}%`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            // 自訂 legend
-            legendEl.innerHTML = items.map(i => {
-                const pct = ((i.value / total) * 100).toFixed(1);
-                return `<div class="pie-legend-item">
-                    <div class="pie-legend-dot" style="background:${i.color};"></div>
-                    <span style="color:var(--text-color);font-weight:bold;">${i.name}</span>
-                    <span style="margin-left:auto;font-family:monospace;">${pct}%</span>
-                </div>`;
-            }).join('');
-
-            return instance;
-        }
-
-        function renderPieCharts(sectorValues, sectorGains) {
-            destroyPieCharts();
-
-            // 持倉市值
-            const valueItems = Object.keys(sectorValues)
-                .map(k => ({ name: k, value: sectorValues[k].value, color: sectorValues[k].color }))
-                .filter(i => i.value > 0)
-                .sort((a, b) => b.value - a.value);
-
-            // 獲益（只顯示正損益）
-            const gainItems = Object.keys(sectorGains)
-                .map(k => ({ name: k, value: sectorGains[k].value, color: sectorGains[k].color }))
-                .filter(i => i.value > 0)
-                .sort((a, b) => b.value - a.value);
-
-            pieValueInstance = buildPieChart('pieValueChart', 'pieValueLegend', valueItems, '尚無持倉資料');
-            pieGainInstance  = buildPieChart('pieGainChart',  'pieGainLegend',  gainItems,  '尚無獲益產業資料');
-        }
-
-        // ====== 主題 ======
+        // ====== 全局主題與 Modal 邏輯 ======
+        
         let currentTheme = localStorage.getItem('userTheme') || 'dark';
         document.documentElement.setAttribute('data-theme', currentTheme);
         updateThemeBtnUI();
@@ -428,42 +338,65 @@
             document.documentElement.setAttribute('data-theme', currentTheme);
             localStorage.setItem('userTheme', currentTheme);
             updateThemeBtnUI();
+            // 重新渲染圖表以套用新顏色
             Object.keys(chartInstances).forEach(id => { if (chartInstances[id]) chartInstances[id].render(); });
         }
         function updateThemeBtnUI() {
             const btn = document.getElementById('themeBtn');
-            btn.innerHTML = currentTheme === 'light' ? '🌞 淺色' : '🌙 深色';
+            if(currentTheme === 'light') { btn.innerHTML = '🌞 淺色'; } 
+            else { btn.innerHTML = '🌙 深色'; }
         }
 
-        // ====== Modal ======
+        // 自訂 Modal 核心函數
         function showCustomModal(options) {
-            const modal     = document.getElementById('customModal');
-            const titleEl   = document.getElementById('modalTitle');
-            const msgEl     = document.getElementById('modalMsg');
-            const inputEl   = document.getElementById('modalInput');
+            const modal = document.getElementById('customModal');
+            const titleEl = document.getElementById('modalTitle');
+            const msgEl = document.getElementById('modalMsg');
+            const inputEl = document.getElementById('modalInput');
             const cancelBtn = document.getElementById('modalCancelBtn');
-            const confirmBtn= document.getElementById('modalConfirmBtn');
-            titleEl.innerText  = options.title   || '提示';
-            msgEl.innerHTML    = options.message  || '';
-            if (options.type === 'prompt') { inputEl.style.display = 'block'; inputEl.value = options.value || ''; setTimeout(() => inputEl.focus(), 100); }
-            else { inputEl.style.display = 'none'; }
-            cancelBtn.style.display = options.type === 'alert' ? 'none' : 'block';
-            cancelBtn.onclick  = null; confirmBtn.onclick = null; inputEl.onkeydown = null;
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+
+            titleEl.innerText = options.title || '提示';
+            msgEl.innerHTML = options.message || '';
+            
+            if (options.type === 'prompt') {
+                inputEl.style.display = 'block';
+                inputEl.value = options.value || '';
+                setTimeout(() => inputEl.focus(), 100);
+            } else {
+                inputEl.style.display = 'none';
+            }
+
+            if (options.type === 'alert') {
+                cancelBtn.style.display = 'none';
+            } else {
+                cancelBtn.style.display = 'block';
+            }
+
+            // 清除之前的事件綁定 (重要)
+            cancelBtn.onclick = null;
+            confirmBtn.onclick = null;
+            inputEl.onkeydown = null;
+
             const closeModal = () => modal.classList.remove('show');
-            cancelBtn.onclick  = () => { closeModal(); if (options.onCancel) options.onCancel(); };
+
+            cancelBtn.onclick = () => { closeModal(); if(options.onCancel) options.onCancel(); };
+            
             const triggerConfirm = () => {
                 closeModal();
-                if (options.onConfirm) {
+                if(options.onConfirm) {
                     if (options.type === 'prompt') options.onConfirm(inputEl.value.trim());
                     else options.onConfirm();
                 }
             };
-            confirmBtn.onclick    = triggerConfirm;
-            inputEl.onkeydown     = (e) => { if (e.key === 'Enter') triggerConfirm(); };
+            
+            confirmBtn.onclick = triggerConfirm;
+            inputEl.onkeydown = (e) => { if(e.key === 'Enter') triggerConfirm(); };
+
             modal.classList.add('show');
         }
 
-        // ====== 群組 ======
+        // 群組名稱邏輯
         let groupNames = JSON.parse(localStorage.getItem('userGroupNames')) || { 1: '群組一', 2: '群組二', 3: '群組三' };
         function updateGroupButtonsText() {
             document.getElementById('grp-name-1').innerText = groupNames[1];
@@ -471,50 +404,181 @@
             document.getElementById('grp-name-3').innerText = groupNames[3];
         }
         updateGroupButtonsText();
+
         window.renameGroup = function(num) {
-            showCustomModal({ type: 'prompt', title: '✏️ 編輯群組名稱', message: '請輸入你想為這個組合設定的新名稱：', value: groupNames[num],
-                onConfirm: (newName) => { if (newName) { groupNames[num] = newName; localStorage.setItem('userGroupNames', JSON.stringify(groupNames)); updateGroupButtonsText(); } }
+            showCustomModal({
+                type: 'prompt',
+                title: '✏️ 編輯群組名稱',
+                message: `請輸入你想為這個組合設定的新名稱：`,
+                value: groupNames[num],
+                onConfirm: (newName) => {
+                    if(newName) {
+                        groupNames[num] = newName;
+                        localStorage.setItem('userGroupNames', JSON.stringify(groupNames));
+                        updateGroupButtonsText();
+                    }
+                }
             });
         };
+
         window.saveGroup = function(groupNum) {
-            if (selectedAssets.length === 0) { showCustomModal({ type: 'alert', title: '⚠️ 儲存失敗', message: '目前畫面沒有選擇任何標的，無法儲存喔！' }); return; }
+            if (selectedAssets.length === 0) {
+                showCustomModal({ type: 'alert', title: '⚠️ 儲存失敗', message: '目前畫面沒有選擇任何標的，無法儲存喔！<br>(請先在上方搜尋並新增想要看的標的)' });
+                return;
+            }
             localStorage.setItem('userCustomGroup' + groupNum, JSON.stringify(selectedAssets));
-            showCustomModal({ type: 'alert', title: '✅ 儲存成功', message: `已經將目前畫面的標的儲存至 <b>【${groupNames[groupNum]}】</b>！` });
+            showCustomModal({ 
+                type: 'alert', 
+                title: '✅ 儲存成功', 
+                message: `已經將目前畫面的標的儲存至 <b>【${groupNames[groupNum]}】</b>！<br>下次看盤只要點擊按鈕就能直接叫出這 ${selectedAssets.length} 個標的。` 
+            });
         };
+
         window.loadGroup = function(groupNum) {
             const savedData = localStorage.getItem('userCustomGroup' + groupNum);
             if (savedData) {
                 const parsedAssets = JSON.parse(savedData);
-                if (parsedAssets && parsedAssets.length > 0) { selectedAssets = parsedAssets; updateUI(); }
-                else { showCustomModal({ type: 'alert', title: '⚠️ 讀取失敗', message: `<b>【${groupNames[groupNum]}】</b> 目前是空的喔！` }); }
-            } else { showCustomModal({ type: 'alert', title: '⚠️ 無資料', message: `<b>【${groupNames[groupNum]}】</b> 尚未記錄任何資料，請先儲存。` }); }
+                if (parsedAssets && parsedAssets.length > 0) {
+                    selectedAssets = parsedAssets;
+                    updateUI();
+                } else {
+                    showCustomModal({ type: 'alert', title: '⚠️ 讀取失敗', message: `<b>【${groupNames[groupNum]}】</b> 目前是空的喔！` });
+                }
+            } else {
+                showCustomModal({ type: 'alert', title: '⚠️ 無資料', message: `<b>【${groupNames[groupNum]}】</b> 尚未記錄任何資料，請先儲存。` });
+            }
         };
 
-        // ====== 假資料 ======
+        // ====== 全新擴充資料來源 (終極完善版) ======
+        const TW_STOCKS = [
+            // 科技與半導體
+            {id:'2330',name:'台積電'},{id:'2317',name:'鴻海'},{id:'2454',name:'聯發科'},
+            {id:'2308',name:'台達電'},{id:'3231',name:'緯創'},{id:'2382',name:'廣達'},
+            {id:'2303',name:'聯電'},{id:'2356',name:'英業達'},
+            // 金融保險
+            {id:'2881',name:'富邦金'},{id:'2882',name:'國泰金'},{id:'2891',name:'中信金'},
+            {id:'2886',name:'兆豐金'},
+            // 傳產、電信、航運、重電
+            {id:'2412',name:'中華電'},{id:'2603',name:'長榮'},{id:'2618',name:'長榮航'},
+            {id:'1519',name:'華城'}
+        ];
+        
+        const TW_ETFS = [
+            // 大盤市值型
+            {id:'0050',name:'元大台灣50'},{id:'006208',name:'富邦台50'},
+            // 高股息系列
+            {id:'0056',name:'元大高股息'},{id:'00878',name:'國泰永續高股息'},
+            {id:'00919',name:'群益台灣精選高息'},{id:'00713',name:'元大台灣高息低波'},
+            {id:'00929',name:'復華台灣科技優息'},{id:'00940',name:'元大台灣價值高息'},
+            {id:'00939',name:'統一台灣高息動能'},{id:'00915',name:'凱基優選高股息30'},
+            // 產業主題型
+            {id:'00881',name:'國泰台灣5G+'},{id:'00757',name:'統一FANG+'},
+            // 債券型 (B)
+            {id:'00679B',name:'元大美債20年'},{id:'00687B',name:'國泰20年美債'},
+            {id:'00937B',name:'群益ESG投等債20+'},
+            // 槓桿與反向 (L/R)
+            {id:'00631L',name:'元大台灣50正2'},{id:'00632R',name:'元大台灣50反1'},
+            // 主動型 ETF (A)
+            {id:'00403A',name:'主動統一升級50'},{id:'00981A',name:'主動統一台股增長'},
+            {id:'00999A',name:'野村臺灣策略高息主動'}
+        ];
+        
+        const US_STOCKS = [
+            // 科技巨頭
+            {id:'AAPL',name:'Apple (蘋果)'},{id:'MSFT',name:'Microsoft (微軟)'},
+            {id:'NVDA',name:'NVIDIA (輝達)'},{id:'TSLA',name:'Tesla (特斯拉)'},
+            {id:'AMZN',name:'Amazon (亞馬遜)'},{id:'GOOGL',name:'Alphabet (谷歌)'},
+            {id:'META',name:'Meta (臉書)'},{id:'AMD',name:'AMD (超微)'},
+            {id:'AVGO',name:'Broadcom (博通)'},
+            // 台股 ADR
+            {id:'TSM',name:'台積電 ADR'},
+            // 美股大盤 ETF
+            {id:'SPY',name:'SPDR標普500 ETF'},{id:'QQQ',name:'Invesco納斯達克100 ETF'},
+            {id:'VOO',name:'Vanguard標普500 ETF'}
+        ];
+        
+        const FOREX_DATA= [
+            {id:'USD/TWD',name:'美元/台幣 (USD)'},{id:'JPY/TWD',name:'日圓/台幣 (JPY)'},
+            {id:'EUR/TWD',name:'歐元/台幣 (EUR)'},{id:'GOLD',name:'黃金 (Gold)'},
+            {id:'BTC/USD',name:'比特幣 (Bitcoin)'},{id:'ETH/USD',name:'以太幣 (Ethereum)'}
+        ];
+
+        // 產業對應表與圓餅圖顏色配對
         const SECTOR_MAPPING = {
-            '2330': { category: '科技與半導體', color: '#2979ff' },
-            '2317': { category: '科技與半導體', color: '#2979ff' },
-            '2454': { category: '科技與半導體', color: '#2979ff' },
-            'AAPL': { category: '科技與半導體', color: '#2979ff' },
-            'MSFT': { category: '科技與半導體', color: '#2979ff' },
-            'NVDA': { category: '科技與半導體', color: '#2979ff' },
-            'TSLA': { category: '電動車與能源', color: '#10b981' },
-            '2881': { category: '金融保險',     color: '#f59e0b' },
-            '0050': { category: '大盤型 ETF',   color: '#8b5cf6' },
-            '0056': { category: '高息型 ETF',   color: '#ec4899' },
-            '00878':{ category: '高息型 ETF',   color: '#ec4899' },
-            '00919':{ category: '高息型 ETF',   color: '#ec4899' },
-            'USD/TWD':{ category: '外匯與貴金屬', color: '#eab308' },
-            'JPY/TWD':{ category: '外匯與貴金屬', color: '#eab308' },
-            'GOLD':   { category: '外匯與貴金屬', color: '#eab308' }
+            // 科技與半導體 (藍色系)
+            '2330': { category: '科技與半導體', color: '#2979ff' }, '2317': { category: '科技與半導體', color: '#2979ff' },
+            '2454': { category: '科技與半導體', color: '#2979ff' }, '2308': { category: '科技與半導體', color: '#2979ff' },
+            '3231': { category: '科技與半導體', color: '#2979ff' }, '2382': { category: '科技與半導體', color: '#2979ff' },
+            '2303': { category: '科技與半導體', color: '#2979ff' }, '2356': { category: '科技與半導體', color: '#2979ff' },
+            'AAPL': { category: '科技與半導體', color: '#2979ff' }, 'MSFT': { category: '科技與半導體', color: '#2979ff' },
+            'NVDA': { category: '科技與半導體', color: '#2979ff' }, 'AMZN': { category: '科技與半導體', color: '#2979ff' },
+            'GOOGL':{ category: '科技與半導體', color: '#2979ff' }, 'META': { category: '科技與半導體', color: '#2979ff' },
+            'AMD':  { category: '科技與半導體', color: '#2979ff' }, 'AVGO': { category: '科技與半導體', color: '#2979ff' },
+            'TSM':  { category: '科技與半導體', color: '#2979ff' },
+            
+            // 電動車與能源 (綠色系)
+            'TSLA': { category: '電動車與能源', color: '#10b981' }, '1519': { category: '重電與能源', color: '#10b981' },
+            
+            // 金融保險 (橘色系)
+            '2881': { category: '金融保險', color: '#f59e0b' }, '2882': { category: '金融保險', color: '#f59e0b' },
+            '2891': { category: '金融保險', color: '#f59e0b' }, '2886': { category: '金融保險', color: '#f59e0b' },
+            
+            // 傳產與航運 (青色系)
+            '2412': { category: '傳產與電信', color: '#00bcd4' }, '2603': { category: '航運類股', color: '#00bcd4' },
+            '2618': { category: '航運類股', color: '#00bcd4' },
+            
+            // ETF 區塊
+            '0050': { category: '大盤型 ETF', color: '#8b5cf6' }, '006208':{category: '大盤型 ETF', color: '#8b5cf6' },
+            'SPY':  { category: '大盤型 ETF', color: '#8b5cf6' }, 'VOO':  { category: '大盤型 ETF', color: '#8b5cf6' },
+            
+            '0056': { category: '高息型 ETF', color: '#ec4899' }, '00878':{ category: '高息型 ETF', color: '#ec4899' },
+            '00919':{ category: '高息型 ETF', color: '#ec4899' }, '00713':{ category: '高息型 ETF', color: '#ec4899' },
+            '00929':{ category: '高息型 ETF', color: '#ec4899' }, '00940':{ category: '高息型 ETF', color: '#ec4899' },
+            '00939':{ category: '高息型 ETF', color: '#ec4899' }, '00915':{ category: '高息型 ETF', color: '#ec4899' },
+            
+            '00881':{ category: '主題/海外 ETF',color: '#3f51b5' }, '00757':{ category: '主題/海外 ETF',color: '#3f51b5' },
+            'QQQ':  { category: '主題/海外 ETF',color: '#3f51b5' },
+            
+            '00679B':{category: '債券型 ETF', color: '#4caf50' }, '00687B':{category: '債券型 ETF', color: '#4caf50' },
+            '00937B':{category: '債券型 ETF', color: '#4caf50' },
+            
+            '00631L':{category: '槓桿/反向 ETF', color: '#ef4444' }, '00632R':{category: '槓桿/反向 ETF', color: '#ef4444' },
+            
+            '00403A':{category: '主動型 ETF', color: '#d946ef' }, '00981A':{category: '主動型 ETF', color: '#d946ef' },
+            '00999A':{category: '主動型 ETF', color: '#d946ef' },
+            
+            // 外匯與加密貨幣 (黃色系)
+            'USD/TWD':{ category: '外匯與加密貨幣', color: '#eab308' }, 'JPY/TWD':{ category: '外匯與加密貨幣', color: '#eab308' },
+            'EUR/TWD':{ category: '外匯與加密貨幣', color: '#eab308' }, 'GOLD':   { category: '外匯與加密貨幣', color: '#eab308' },
+            'BTC/USD':{ category: '外匯與加密貨幣', color: '#eab308' }, 'ETH/USD':{ category: '外匯與加密貨幣', color: '#eab308' }
         };
 
         function generateMockStockData(assetId) {
             let data = []; let basePrice = 100;
+            // 賦予模擬預設價格 (貼近2026年概況)
             if (assetId === '2330') basePrice = 845;
+            else if (assetId === '2317') basePrice = 150;
+            else if (assetId === '2454') basePrice = 1050;
+            else if (assetId === '2603') basePrice = 200;
+            else if (assetId === '1519') basePrice = 800; // 華城
             else if (assetId === 'AAPL') basePrice = 175;
             else if (assetId === 'NVDA') basePrice = 900;
-            else if (assetId === '2454') basePrice = 1050;
+            else if (assetId === 'TSM') basePrice = 150; // ADR
+            else if (assetId === 'AVGO') basePrice = 1300;
+            else if (assetId === '0050') basePrice = 160;
+            else if (assetId === '006208') basePrice = 90;
+            else if (assetId === '0056') basePrice = 40;
+            else if (assetId === '00878') basePrice = 22;
+            else if (assetId === '00919') basePrice = 25;
+            else if (assetId === '00929') basePrice = 20;
+            else if (assetId === '00940') basePrice = 10;
+            else if (assetId === '00939') basePrice = 14;
+            else if (assetId === '00679B' || assetId === '00687B') basePrice = 30; // 債券
+            else if (assetId === '00631L') basePrice = 180; // 正2
+            else if (assetId === '00632R') basePrice = 3.5; // 反1
+            else if (assetId.includes('A')) basePrice = 15; // 主動型預設
+            else if (['SPY','VOO','QQQ'].includes(assetId)) basePrice = 500;
+            
             let currentPrice = basePrice;
             let now = new Date(); now.setDate(now.getDate() - 120);
             for (let i = 0; i <= 120; i++) {
@@ -529,289 +593,624 @@
             }
             return data;
         }
+
         function generateMockForexData(assetId) {
-            let data = []; let basePrice = 30;
+            let data = [];
+            let basePrice = 30;
             if (assetId.includes('JPY')) basePrice = 0.21;
             else if (assetId === 'GOLD') basePrice = 2300;
+            else if (assetId.includes('BTC')) basePrice = 65000;
+            else if (assetId.includes('ETH')) basePrice = 3500;
+            
             let currentPrice = basePrice;
-            let now = new Date(); now.setDate(now.getDate() - 120);
+            let now = new Date();
+            now.setDate(now.getDate() - 120);
+            
             for (let i = 0; i <= 120; i++) {
                 currentPrice = currentPrice + (Math.random() - 0.5) * (basePrice * 0.01);
-                let y = now.getFullYear(), m = String(now.getMonth()+1).padStart(2,'0'), d = String(now.getDate()).padStart(2,'0');
-                data.push({ date: `${y}-${m}-${d}`, value: currentPrice });
+                let y = now.getFullYear();
+                let m = String(now.getMonth() + 1).padStart(2, '0');
+                let d = String(now.getDate()).padStart(2, '0');
+                let dateStr = `${y}-${m}-${d}`;
+                data.push({ date: dateStr, value: currentPrice });
                 now.setDate(now.getDate() + 1);
             }
             return data;
         }
 
-        // ====== K線圖 ======
         const CustomMiniChart = {
             createChart: function(container, assetId) {
                 const canvas = document.createElement('canvas');
-                canvas.style.width='100%'; canvas.style.height='100%'; canvas.style.display='block';
-                container.appendChild(canvas);
-                const dpr = window.devicePixelRatio || 1; const ctx = canvas.getContext('2d');
+                canvas.style.width = '100%'; canvas.style.height = '100%';
+                canvas.style.display = 'block'; container.appendChild(canvas);
+                const dpr = window.devicePixelRatio || 1; const ctx = canvas.getContext('2d'); 
+
                 const instance = {
-                    canvas, ctx, width: 0, height: 380,
+                    canvas: canvas, ctx: ctx, width: 0, height: 380,
                     fullData: [], displayData: [], type: 'stock', mouseX: -1, mouseY: -1,
-                    init(type, rawData) {
+                    
+                    init: function(type, rawData) {
                         this.type = type;
-                        if (type === 'stock') for (let i=0;i<rawData.length;i++) { rawData[i].ma5=this.calcMA(rawData,i,5); rawData[i].ma10=this.calcMA(rawData,i,10); rawData[i].ma20=this.calcMA(rawData,i,20); }
-                        this.fullData = rawData; this.setFilterDays(60); this.setupEvents();
+                        if (type === 'stock') {
+                            for (let i = 0; i < rawData.length; i++) {
+                                rawData[i].ma5 = this.calcMA(rawData, i, 5);
+                                rawData[i].ma10 = this.calcMA(rawData, i, 10);
+                                rawData[i].ma20 = this.calcMA(rawData, i, 20);
+                            }
+                        }
+                        this.fullData = rawData; 
+                        this.setFilterDays(60); 
+                        this.setupEvents();
                     },
-                    calcMA(data, index, period) { if (index < period-1) return null; let s=0; for(let j=0;j<period;j++) s+=data[index-j].close; return s/period; },
-                    setFilterDays(days) { this.displayData = this.fullData.slice(-days); this.render(); },
-                    setCustomDateRange(startStr, endStr) {
-                        let f = this.fullData;
-                        if (startStr) f = f.filter(d => d.date >= startStr);
-                        if (endStr)   f = f.filter(d => d.date <= endStr);
-                        this.displayData = f; this.render();
+                    calcMA: function(data, index, period) {
+                        if (index < period - 1) return null;
+                        let sum = 0; for (let j = 0; j < period; j++) sum += data[index - j].close; return sum / period;
                     },
-                    render() {
+                    setFilterDays: function(days) {
+                        this.displayData = this.fullData.slice(-days);
+                        this.render();
+                    },
+                    setCustomDateRange: function(startStr, endStr) {
+                        let filtered = this.fullData;
+                        if (startStr) filtered = filtered.filter(d => d.date >= startStr);
+                        if (endStr) filtered = filtered.filter(d => d.date <= endStr);
+                        this.displayData = filtered;
+                        this.render();
+                    },
+                    render: function() {
                         let hoverIdx = -1;
-                        const pL=10, pR=75, pT=15, pB=25;
-                        if (this.width>0 && this.displayData.length>0) {
-                            const cw = this.width-pL-pR;
-                            const step = this.displayData.length>1 ? cw/(this.displayData.length-1) : cw;
-                            if (this.mouseX>=pL && this.mouseX<=this.width-pR) { hoverIdx=Math.round((this.mouseX-pL)/step); hoverIdx=Math.max(0,Math.min(hoverIdx,this.displayData.length-1)); }
+                        const paddingLeft = 10; const paddingRight = 75; const paddingTop = 15; const paddingBottom = 25; 
+                        
+                        if (this.width > 0 && this.displayData.length > 0) {
+                            const chartWidth = this.width - paddingLeft - paddingRight;
+                            const step = this.displayData.length > 1 ? chartWidth / (this.displayData.length - 1) : chartWidth;
+                            if (this.mouseX >= paddingLeft && this.mouseX <= this.width - paddingRight) {
+                                hoverIdx = Math.round((this.mouseX - paddingLeft) / step); 
+                                hoverIdx = Math.max(0, Math.min(hoverIdx, this.displayData.length - 1));
+                            }
                         }
+
                         this.updateInfoPanel(hoverIdx);
-                        const gridColor = getComputedStyle(document.body).getPropertyValue('--border-color').trim()||'#2a2e39';
-                        const textColor = getComputedStyle(document.body).getPropertyValue('--text-secondary').trim()||'#8b92a5';
-                        const bullColor = getComputedStyle(document.body).getPropertyValue('--bull-color').trim()||'#ff4d4f';
-                        const bearColor = getComputedStyle(document.body).getPropertyValue('--bear-color').trim()||'#00e676';
-                        if (this.width<=0||this.displayData.length===0) {
-                            const ctx=this.ctx; ctx.clearRect(0,0,this.width,this.height);
-                            ctx.fillStyle=textColor; ctx.font='16px sans-serif'; ctx.textAlign='center';
-                            if(this.width>0) ctx.fillText("此區間無歷史交易資料",this.width/2,this.height/2); return;
+
+                        // 動態讀取 CSS 變數以支援深淺色
+                        const gridColor = getComputedStyle(document.body).getPropertyValue('--border-color').trim() || '#2a2e39';
+                        const textColor = getComputedStyle(document.body).getPropertyValue('--text-secondary').trim() || '#8b92a5';
+                        const bullColor = getComputedStyle(document.body).getPropertyValue('--bull-color').trim() || '#ff4d4f';
+                        const bearColor = getComputedStyle(document.body).getPropertyValue('--bear-color').trim() || '#00e676';
+
+                        if (this.width <= 0 || this.displayData.length === 0) {
+                            const ctx = this.ctx; ctx.clearRect(0, 0, this.width, this.height);
+                            ctx.fillStyle = textColor; ctx.font = '16px sans-serif'; ctx.textAlign = 'center';
+                            if (this.width > 0) ctx.fillText("此區間無歷史交易資料", this.width/2, this.height/2);
+                            return;
                         }
-                        const ctx=this.ctx; ctx.clearRect(0,0,this.width,this.height);
-                        const cw=this.width-pL-pR, totalH=this.height-pT-pB;
-                        const kH=totalH*0.70, vH=totalH*0.25, vTopY=pT+kH+(totalH*0.05);
-                        let minVal=Infinity, maxVal=-Infinity, maxVol=0;
+
+                        const ctx = this.ctx; ctx.clearRect(0, 0, this.width, this.height);
+                        const chartWidth = this.width - paddingLeft - paddingRight;
+                        const totalInnerHeight = this.height - paddingTop - paddingBottom;
+                        const klineHeight = totalInnerHeight * 0.70; const volHeight = totalInnerHeight * 0.25;
+                        const volTopY = paddingTop + klineHeight + (totalInnerHeight * 0.05); 
+
+                        let minVal = Infinity, maxVal = -Infinity, maxVol = 0;
                         this.displayData.forEach(d => {
-                            if (this.type==='stock') {
-                                if(d.low<minVal) minVal=d.low; if(d.high>maxVal) maxVal=d.high;
-                                if(d.ma5&&d.ma5>maxVal) maxVal=d.ma5; if(d.ma5&&d.ma5<minVal) minVal=d.ma5;
-                                if(d.volume>maxVol) maxVol=d.volume;
-                            } else { if(d.value<minVal) minVal=d.value; if(d.value>maxVal) maxVal=d.value; }
+                            if (this.type === 'stock') {
+                                if (d.low < minVal) minVal = d.low; if (d.high > maxVal) maxVal = d.high;
+                                if (d.ma5 && d.ma5 > maxVal) maxVal = d.ma5; if (d.ma5 && d.ma5 < minVal) minVal = d.ma5;
+                                if (d.volume > maxVol) maxVol = d.volume;
+                            } else {
+                                if (d.value < minVal) minVal = d.value; if (d.value > maxVal) maxVal = d.value;
+                            }
                         });
-                        const vr=maxVal-minVal||1; maxVal+=vr*0.05; minVal-=vr*0.05;
-                        const getY = v => pT+kH-((v-minVal)/(maxVal-minVal))*kH;
-                        const getVY= v => vTopY+vH-(v/maxVol)*vH;
-                        const step = this.displayData.length>1 ? cw/(this.displayData.length-1) : cw;
-                        ctx.strokeStyle=gridColor; ctx.lineWidth=1; ctx.fillStyle=textColor; ctx.font='13px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='middle';
-                        for (let i=0;i<=4;i++) { const tv=minVal+((maxVal-minVal)*(i/4)); const y=getY(tv); ctx.beginPath(); ctx.moveTo(pL,y); ctx.lineTo(this.width-pR,y); ctx.stroke(); ctx.fillText(tv.toFixed(tv<10?4:2),this.width-pR+8,y); }
-                        if (this.type==='stock'&&maxVol>0) {
-                            ctx.font='12px sans-serif';
-                            const tvy=getVY(maxVol); ctx.beginPath(); ctx.moveTo(pL,tvy); ctx.lineTo(this.width-pR,tvy); ctx.stroke();
-                            ctx.fillText(maxVol>=1000?(maxVol/1000).toFixed(1)+'k':maxVol, this.width-pR+8, tvy);
-                            const mv=maxVol/2, mvy=getVY(mv); ctx.beginPath(); ctx.moveTo(pL,mvy); ctx.lineTo(this.width-pR,mvy); ctx.stroke();
-                            ctx.fillText(mv>=1000?(mv/1000).toFixed(1)+'k':Math.floor(mv), this.width-pR+8, mvy);
+                        const valRange = maxVal - minVal || 1; maxVal += valRange * 0.05; minVal -= valRange * 0.05;
+                        const getY = (val) => paddingTop + klineHeight - ((val - minVal) / (maxVal - minVal)) * klineHeight;
+                        const getVolY = (vol) => volTopY + volHeight - (vol / maxVol) * volHeight;
+                        const step = this.displayData.length > 1 ? chartWidth / (this.displayData.length - 1) : chartWidth;
+
+                        ctx.strokeStyle = gridColor; ctx.lineWidth = 1; ctx.fillStyle = textColor; ctx.font = '13px sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+                        for (let i = 0; i <= 4; i++) {
+                            const targetVal = minVal + ((maxVal - minVal) * (i / 4)); const y = getY(targetVal);
+                            ctx.beginPath(); ctx.moveTo(paddingLeft, y); ctx.lineTo(this.width - paddingRight, y); ctx.stroke();
+                            ctx.fillText(targetVal.toFixed(targetVal < 10 ? 4 : 2), this.width - paddingRight + 8, y);
                         }
-                        if (this.type==='stock') {
-                            ctx.beginPath(); ctx.moveTo(pL,vTopY); ctx.lineTo(this.width-pR,vTopY); ctx.stroke();
-                            this.displayData.forEach((d,idx) => {
-                                const x=pL+idx*step; const isUp=d.close>=d.open; const color=isUp?bullColor:bearColor;
-                                ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=1.5;
-                                ctx.beginPath(); ctx.moveTo(x,getY(d.high)); ctx.lineTo(x,getY(d.low)); ctx.stroke();
-                                const bw=Math.max(Math.min(12,cw/this.displayData.length*0.6),3);
-                                ctx.fillRect(x-bw/2,Math.min(getY(d.open),getY(d.close)),bw,Math.max(Math.abs(getY(d.close)-getY(d.open)),2));
-                                const vy=getVY(d.volume); ctx.fillRect(x-bw/2,vy,bw,vTopY+vH-vy);
+
+                        if (this.type === 'stock' && maxVol > 0) {
+                            ctx.font = '12px sans-serif';
+                            const topVolY = getVolY(maxVol);
+                            ctx.beginPath(); ctx.moveTo(paddingLeft, topVolY); ctx.lineTo(this.width - paddingRight, topVolY); 
+                            ctx.stroke();
+                            let volLabel = maxVol >= 1000 ? (maxVol/1000).toFixed(1) + 'k' : maxVol;
+                            ctx.fillText(volLabel, this.width - paddingRight + 8, topVolY);
+                            
+                            const midVol = maxVol / 2; const midVolY = getVolY(midVol);
+                            ctx.beginPath(); ctx.moveTo(paddingLeft, midVolY); ctx.lineTo(this.width - paddingRight, midVolY); 
+                            ctx.stroke();
+                            let midVolLabel = midVol >= 1000 ? (midVol/1000).toFixed(1) + 'k' : Math.floor(midVol);
+                            ctx.fillText(midVolLabel, this.width - paddingRight + 8, midVolY);
+                        }
+
+                        if (this.type === 'stock') {
+                            ctx.beginPath(); ctx.moveTo(paddingLeft, volTopY); ctx.lineTo(this.width - paddingRight, volTopY); ctx.stroke();
+                            this.displayData.forEach((d, idx) => {
+                                const x = paddingLeft + idx * step; const isUp = d.close >= d.open; const color = isUp ? bullColor : bearColor;
+                                ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 1.5;
+                                ctx.beginPath(); ctx.moveTo(x, getY(d.high)); ctx.lineTo(x, getY(d.low)); ctx.stroke();
+                                const boxWidth = Math.max(Math.min(12, chartWidth / this.displayData.length * 0.6), 3);
+                                ctx.fillRect(x - boxWidth/2, Math.min(getY(d.open), getY(d.close)), boxWidth, Math.max(Math.abs(getY(d.close) - getY(d.open)), 2));
+                                const vY = getVolY(d.volume); ctx.fillRect(x - boxWidth/2, vY, boxWidth, volTopY + volHeight - vY);
                             });
-                            const drawMA=(key,color)=>{ ctx.strokeStyle=color; ctx.lineWidth=2; ctx.beginPath(); let s=false; this.displayData.forEach((d,idx)=>{ if(d[key]!==null){const x=pL+idx*step,y=getY(d[key]); if(!s){ctx.moveTo(x,y);s=true;}else ctx.lineTo(x,y);}}); ctx.stroke(); };
-                            drawMA('ma5','#4facfe'); drawMA('ma10','#b620e0'); drawMA('ma20','#ffb129');
+
+                            const drawMA = (key, color) => {
+                                ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath(); let started = false;
+                                this.displayData.forEach((d, idx) => {
+                                    if (d[key] !== null) {
+                                        const x = paddingLeft + idx * step; const y = getY(d[key]);
+                                        if (!started) { ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
+                                    }
+                                }); ctx.stroke();
+                            };
+                            drawMA('ma5', '#4facfe'); drawMA('ma10', '#b620e0'); drawMA('ma20', '#ffb129');
                         } else {
-                            ctx.strokeStyle='#ffb129'; ctx.lineWidth=2.5; ctx.beginPath();
-                            this.displayData.forEach((d,idx)=>{ const x=pL+idx*step,y=getY(d.value); if(idx===0)ctx.moveTo(x,y);else ctx.lineTo(x,y); }); ctx.stroke();
+                            ctx.strokeStyle = '#ffb129'; ctx.lineWidth = 2.5; ctx.beginPath();
+                            this.displayData.forEach((d, idx) => {
+                                const x = paddingLeft + idx * step; const y = getY(d.value);
+                                if(idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                            }); ctx.stroke();
                         }
-                        if (this.mouseX>=pL&&this.mouseX<=this.width-pR&&this.mouseY>=pT&&this.mouseY<=this.height-pB) {
-                            ctx.strokeStyle=textColor; ctx.setLineDash([4,4]);
-                            const sx=hoverIdx!==-1?(pL+hoverIdx*step):this.mouseX;
-                            ctx.beginPath(); ctx.moveTo(sx,pT); ctx.lineTo(sx,this.height-pB); ctx.stroke();
-                            ctx.beginPath(); ctx.moveTo(pL,this.mouseY); ctx.lineTo(this.width-pR,this.mouseY); ctx.stroke();
-                            ctx.setLineDash([]);
+
+                        if (this.mouseX >= paddingLeft && this.mouseX <= this.width - paddingRight && this.mouseY >= paddingTop && this.mouseY <= this.height - paddingBottom) {
+                            ctx.strokeStyle = textColor; ctx.setLineDash([4, 4]);
+                            const snapX = hoverIdx !== -1 ? (paddingLeft + hoverIdx * step) : this.mouseX;
+                            ctx.beginPath(); ctx.moveTo(snapX, paddingTop); ctx.lineTo(snapX, this.height - paddingBottom); ctx.stroke();
+                            ctx.beginPath(); ctx.moveTo(paddingLeft, this.mouseY); ctx.lineTo(this.width - paddingRight, this.mouseY); ctx.stroke();
+                            ctx.setLineDash([]); 
                         }
                     },
-                    setupEvents() {
-                        const self=this;
-                        canvas.addEventListener('mousemove',e=>{ const r=canvas.getBoundingClientRect(); self.mouseX=e.clientX-r.left; self.mouseY=e.clientY-r.top; self.render(); });
-                        canvas.addEventListener('mouseleave',()=>{ self.mouseX=-1; self.mouseY=-1; self.render(); });
+                    setupEvents: function() {
+                        const self = this;
+                        canvas.addEventListener('mousemove', function(e) {
+                            const rect = canvas.getBoundingClientRect();
+                            self.mouseX = e.clientX - rect.left; self.mouseY = e.clientY - rect.top; self.render();
+                        });
+                        canvas.addEventListener('mouseleave', function() { self.mouseX = -1; self.mouseY = -1; self.render(); });
                     },
-                    updateInfoPanel(idx) {
-                        const panel=document.getElementById(`info-panel-${assetId}`);
-                        const legend=document.getElementById(`ma-legend-${assetId}`);
-                        const headerPnl=document.getElementById(`header-pnl-${assetId}`);
-                        if(!panel) return;
-                        const ti=(idx===-1||!this.displayData[idx])?this.displayData.length-1:idx;
-                        const d=this.displayData[ti]; if(!d) return;
-                        const hasTrade=tradeHistory.some(t=>t.assetId===assetId);
-                        const state=calcAssetHoldingState(assetId);
-                        const curPrice=this.type==='stock'?d.close:d.value;
+                    updateInfoPanel: function(idx) {
+                        const panel = document.getElementById(`info-panel-${assetId}`);
+                        const legend = document.getElementById(`ma-legend-${assetId}`);
+                        const headerPnl = document.getElementById(`header-pnl-${assetId}`);
+                        if (!panel) return;
+                        
+                        const targetIdx = (idx === -1 || !this.displayData[idx]) ? this.displayData.length - 1 : idx;
+                        const d = this.displayData[targetIdx]; if (!d) return;
+
+                        const hasTrade = tradeHistory.some(t => t.assetId === assetId);
+                        const state = calcAssetHoldingState(assetId);
+                        const curPrice = this.type === 'stock' ? d.close : d.value;
+
                         if (hasTrade) {
-                            const cost=state.avgPrice*state.qty, cv=curPrice*state.qty, netPnl=cv-cost;
-                            const pct=cost>0?((netPnl/cost)*100).toFixed(2):"0.00";
-                            const isEarn=netPnl>=0;
-                            let realStr='';
-                            if(state.realized!==0){const rs=state.realized>0?'+':'';const rc=state.realized>=0?'pnl-text-up':'pnl-text-down';realStr=` | 已實現: <span class="${rc}">${rs}${state.realized.toLocaleString(undefined,{maximumFractionDigits:2})}</span>`;}
-                            if(headerPnl){headerPnl.className='header-pnl-box';if(state.qty>0)headerPnl.classList.add(isEarn?'earn':'loss');const sign=netPnl>0?'+':'';headerPnl.innerHTML=`<div style="font-size:13px;color:var(--text-secondary);font-weight:normal;margin-bottom:2px;">持股: ${state.qty} | 均價: ${state.avgPrice.toFixed(2)}${realStr}</div>未實現: <span class="${isEarn?'pnl-text-up':'pnl-text-down'}">${sign}${netPnl.toLocaleString(undefined,{maximumFractionDigits:2})} (${sign}${pct}%)</span>`;headerPnl.style.display='block';}
-                        } else { if(headerPnl) headerPnl.style.display='none'; }
-                        if (this.type==='stock') {
-                            const ch=d.close-d.open, cp=((ch/d.open)*100).toFixed(2), cc=ch>=0?'info-up':'info-down';
-                            panel.innerHTML=`<div class="info-item">時間: <span class="info-val">${d.date}</span></div><div class="info-item">開: <span class="info-val">${d.open.toFixed(2)}</span></div><div class="info-item">高: <span class="info-val">${d.high.toFixed(2)}</span></div><div class="info-item">低: <span class="info-val">${d.low.toFixed(2)}</span></div><div class="info-item">收: <span class="info-val ${cc}">${d.close.toFixed(2)}</span></div><div class="info-item">量: <span class="info-val">${d.volume.toLocaleString()}</span></div><div class="info-item">當日漲跌: <span class="${cc}">${ch>=0?'▲':'▼'} ${Math.abs(ch).toFixed(2)} (${cp}%)</span></div>`;
-                            if(legend){legend.innerHTML=`<div class="ma-item"><div class="ma-box" style="background:#4facfe;"></div>MA5: ${d.ma5?d.ma5.toFixed(2):'-'}</div><div class="ma-item"><div class="ma-box" style="background:#b620e0;"></div>MA10: ${d.ma10?d.ma10.toFixed(2):'-'}</div><div class="ma-item"><div class="ma-box" style="background:#ffb129;"></div>MA20: ${d.ma20?d.ma20.toFixed(2):'-'}</div>`;}
+                            const cost = state.avgPrice * state.qty;
+                            const currentVal = curPrice * state.qty;
+                            const netPnl = currentVal - cost;
+                            const pnlPct = cost > 0 ? ((netPnl / cost) * 100).toFixed(2) : "0.00";
+                            const isEarn = netPnl >= 0;
+                            
+                            let realizedStr = '';
+                            if (state.realized !== 0) {
+                                const rSign = state.realized > 0 ? '+' : '';
+                                const rColor = state.realized >= 0 ? 'pnl-text-up' : 'pnl-text-down';
+                                realizedStr = ` | 已實現: <span class="${rColor}">${rSign}${state.realized.toLocaleString(undefined, {maximumFractionDigits:2})}</span>`;
+                            }
+
+                            if (headerPnl) {
+                                headerPnl.className = 'header-pnl-box';
+                                if (state.qty > 0) { headerPnl.classList.add(isEarn ? 'earn' : 'loss'); }
+                                const sign = netPnl > 0 ? '+' : '';
+                                headerPnl.innerHTML = `
+                                    <div style="font-size:13px; color:var(--text-secondary); font-weight:normal; margin-bottom:2px;">持股: ${state.qty} | 均價: ${state.avgPrice.toFixed(2)}${realizedStr}</div>
+                                    未實現: <span class="${isEarn?'pnl-text-up':'pnl-text-down'}">${sign}${netPnl.toLocaleString(undefined,{maximumFractionDigits:2})} (${sign}${pnlPct}%)</span>
+                                `;
+                                headerPnl.style.display = 'block';
+                            }
                         } else {
-                            panel.innerHTML=`<div class="info-item">時間: <span class="info-val">${d.date}</span></div><div class="info-item">最新報價: <span class="info-val" style="color:#ffb129">${d.value.toFixed(d.value<10?4:2)}</span></div>`;
-                            if(legend) legend.innerHTML='';
+                            if (headerPnl) headerPnl.style.display = 'none';
+                        }
+
+                        if (this.type === 'stock') {
+                            const change = d.close - d.open;
+                            const changePercent = ((change / d.open) * 100).toFixed(2);
+                            const colorClass = change >= 0 ? 'info-up' : 'info-down';
+                            panel.innerHTML = `
+                                <div class="info-item">時間: <span class="info-val">${d.date}</span></div>
+                                <div class="info-item">開: <span class="info-val">${d.open.toFixed(2)}</span></div>
+                                <div class="info-item">高: <span class="info-val">${d.high.toFixed(2)}</span></div>
+                                <div class="info-item">低: <span class="info-val">${d.low.toFixed(2)}</span></div>
+                                <div class="info-item">收: <span class="info-val ${colorClass}">${d.close.toFixed(2)}</span></div>
+                                <div class="info-item">量: <span class="info-val">${d.volume.toLocaleString()}</span></div>
+                                <div class="info-item">當日漲跌: <span class="${colorClass}">${change>=0?'▲':'▼'} ${Math.abs(change).toFixed(2)} (${changePercent}%)</span></div>
+                            `;
+                            if(legend) {
+                                legend.innerHTML = `
+                                    <div class="ma-item"><div class="ma-box" style="background:#4facfe;"></div>MA5: ${d.ma5 ? d.ma5.toFixed(2) : '-'}</div>
+                                    <div class="ma-item"><div class="ma-box" style="background:#b620e0;"></div>MA10: ${d.ma10 ? d.ma10.toFixed(2) : '-'}</div>
+                                    <div class="ma-item"><div class="ma-box" style="background:#ffb129;"></div>MA20: ${d.ma20 ? d.ma20.toFixed(2) : '-'}</div>
+                                `;
+                            }
+                        } else {
+                            panel.innerHTML = `
+                                <div class="info-item">時間: <span class="info-val">${d.date}</span></div>
+                                <div class="info-item">最新報價: <span class="info-val" style="color:#ffb129">${d.value.toFixed(d.value<10?4:2)}</span></div>
+                            `;
+                            if(legend) legend.innerHTML = '';
                         }
                     }
                 };
-                const observer=new ResizeObserver(entries=>{ for(let e of entries){ const w=e.contentRect.width; if(w>0){canvas.width=w*dpr;canvas.height=380*dpr;ctx.scale(dpr,dpr);instance.width=w;instance.height=380;if(instance.fullData.length>0)instance.render();}} });
-                observer.observe(container); instance.observer=observer;
-                instance.remove=function(){ if(this.observer)this.observer.disconnect(); canvas.remove(); };
+
+                const observer = new ResizeObserver(entries => {
+                    for(let entry of entries) {
+                        const w = entry.contentRect.width;
+                        if(w > 0) {
+                            canvas.width = w * dpr; canvas.height = 380 * dpr; ctx.scale(dpr, dpr);
+                            instance.width = w; instance.height = 380;
+                            if(instance.fullData.length > 0) instance.render();
+                        }
+                    }
+                });
+                observer.observe(container); instance.observer = observer;
+                instance.remove = function() { if(this.observer) this.observer.disconnect(); canvas.remove(); };
                 return instance;
             }
         };
 
-        // ====== 資料來源 ======
-        const TW_STOCKS = [{id:'2330',name:'台積電'},{id:'2317',name:'鴻海'},{id:'2454',name:'聯發科'},{id:'2881',name:'富邦金'}];
-        const TW_ETFS   = [{id:'0050',name:'元大台灣50'},{id:'0056',name:'元大高股息'},{id:'00878',name:'國泰永續高股息'},{id:'00919',name:'群益台灣精選高息'}];
-        const US_STOCKS = [{id:'AAPL',name:'Apple (蘋果)'},{id:'MSFT',name:'Microsoft (微軟)'},{id:'NVDA',name:'NVIDIA (輝達)'},{id:'TSLA',name:'Tesla (特斯拉)'}];
-        const FOREX_DATA= [{id:'USD/TWD',name:'美元 (USD)'},{id:'JPY/TWD',name:'日圓 (JPY)'},{id:'GOLD',name:'黃金 (Gold)'}];
-
         let selectedAssets = []; const maxLimit = 4; let chartInstances = {};
+        
         let tradeHistory = JSON.parse(localStorage.getItem('userTradeHistory')) || [];
 
         function calcAssetHoldingState(assetId) {
-            let totalQty=0, totalCost=0, realizedPnl=0;
-            const ft=tradeHistory.filter(t=>t.assetId===assetId).sort((a,b)=>new Date(a.time)-new Date(b.time));
-            ft.forEach(trade=>{
-                if(trade.type==='buy'){totalQty+=trade.qty;totalCost+=(trade.price*trade.qty);}
-                else if(trade.type==='sell'&&totalQty>0){const avg=totalCost/totalQty;const sq=Math.min(trade.qty,totalQty);realizedPnl+=(trade.price-avg)*sq;totalQty-=sq;totalCost=avg*totalQty;}
+            let totalQty = 0; let totalCost = 0; let realizedPnl = 0;
+            const filteredTrades = tradeHistory.filter(t => t.assetId === assetId).sort((a,b) => new Date(a.time) - new Date(b.time));
+            filteredTrades.forEach(trade => {
+                if (trade.type === 'buy') {
+                    totalQty += trade.qty; totalCost += (trade.price * trade.qty);
+                } else if (trade.type === 'sell') {
+                    if (totalQty > 0) {
+                        const currentAvg = totalCost / totalQty;
+                        const sellQty = Math.min(trade.qty, totalQty);
+                        realizedPnl += (trade.price - currentAvg) * sellQty;
+                        totalQty -= sellQty; totalCost = currentAvg * totalQty;
+                    }
+                }
             });
-            return { qty:totalQty, avgPrice:totalQty>0?(totalCost/totalQty):0, realized:realizedPnl };
+            return { qty: totalQty, avgPrice: totalQty > 0 ? (totalCost / totalQty) : 0, realized: realizedPnl };
         }
 
         function refreshDashboardBackend() {
-            const tbody=document.getElementById('historyTableBody');
-            const dh=[...tradeHistory].sort((a,b)=>new Date(b.time)-new Date(a.time));
-            tbody.innerHTML=dh.map(t=>`<tr><td style="font-family:monospace;color:var(--text-secondary);">${t.time}</td><td style="font-family:monospace;font-weight:bold;">${t.assetId}</td><td>${t.assetName}</td><td><span class="${t.type==='buy'?'badge-buy':'badge-sell'}">${t.type==='buy'?'買入':'賣出'}</span></td><td style="font-family:monospace;text-align:right;">${t.price.toFixed(2)}</td><td style="font-family:monospace;text-align:right;">${t.qty}</td><td><button type="button" class="action-delete-btn" onclick="deleteHistoryRecord('${t.id}')">🗑️ 刪除</button></td></tr>`).join('');
+            const tbody = document.getElementById('historyTableBody');
+            const displayHistory = [...tradeHistory].sort((a,b) => new Date(b.time) - new Date(a.time));
+            
+            tbody.innerHTML = displayHistory.map(t => `
+                <tr>
+                    <td style="font-family:monospace; color:var(--text-secondary);">${t.time}</td>
+                    <td style="font-family:monospace; font-weight:bold;">${t.assetId}</td>
+                    <td>${t.assetName}</td>
+                    <td><span class="${t.type==='buy'?'badge-buy':'badge-sell'}">${t.type==='buy'?'買入':'賣出'}</span></td>
+                    <td style="font-family:monospace; text-align:right;">${t.price.toFixed(2)}</td>
+                    <td style="font-family:monospace; text-align:right;">${t.qty}</td>
+                    <td><button type="button" class="action-delete-btn" onclick="deleteHistoryRecord('${t.id}')">🗑️ 刪除</button></td>
+                </tr>
+            `).join('');
 
-            let overallMarketValue=0, overallInvestedCost=0, overallRealizedPnl=0;
-            let sectorValues={}, sectorGains={};
+            let overallMarketValue = 0;
+            let overallInvestedCost = 0;
+            let overallRealizedPnl = 0;
+            
+            // 4. 計算收益產業占比專用的物件
+            let sectorValues = {}; 
 
-            const allIds=[...new Set(tradeHistory.map(t=>t.assetId))];
-            allIds.forEach(id=>{
-                const state=calcAssetHoldingState(id);
-                overallRealizedPnl+=state.realized;
-                if(state.qty>0){
-                    overallInvestedCost+=(state.avgPrice*state.qty);
-                    let latestPrice=100;
-                    if(chartInstances[id]&&chartInstances[id].fullData.length>0){
-                        const ld=chartInstances[id].fullData[chartInstances[id].fullData.length-1];
-                        latestPrice=ld.close||ld.value;
+            const allAssetIds = [...new Set(tradeHistory.map(t => t.assetId))];
+            allAssetIds.forEach(id => {
+                const state = calcAssetHoldingState(id);
+                overallRealizedPnl += state.realized; 
+
+                if (state.qty > 0) {
+                    overallInvestedCost += (state.avgPrice * state.qty);
+                    
+                    let latestPrice = 100;
+                    if (chartInstances[id] && chartInstances[id].fullData.length > 0) {
+                        const lastData = chartInstances[id].fullData[chartInstances[id].fullData.length - 1];
+                        latestPrice = lastData.close || lastData.value;
                     } else {
-                        if(id==='2330')latestPrice=845;
-                        else if(id==='AAPL')latestPrice=175;
-                        else if(id==='NVDA')latestPrice=900;
-                        else if(id==='2454')latestPrice=1050;
-                        else if(id==='0050')latestPrice=160;
-                        else if(id==='2881')latestPrice=70;
+                        // 賦予模擬預設價格 (貼近2026年概況)
+                        if (id === '2330') latestPrice = 845;
+                        else if (id === '2317') latestPrice = 150;
+                        else if (id === '2454') latestPrice = 1050;
+                        else if (id === '2603') latestPrice = 200;
+                        else if (id === '1519') latestPrice = 800;
+                        else if (id === 'AAPL') latestPrice = 175;
+                        else if (id === 'NVDA') latestPrice = 900;
+                        else if (id === 'TSM') latestPrice = 150;
+                        else if (id === 'AVGO') latestPrice = 1300;
+                        else if (id === '0050') latestPrice = 160;
+                        else if (id === '006208') latestPrice = 90;
+                        else if (id === '0056') latestPrice = 40;
+                        else if (id === '00878') latestPrice = 22;
+                        else if (id === '00919') latestPrice = 25;
+                        else if (id === '00929') latestPrice = 20;
+                        else if (id === '00940') latestPrice = 10;
+                        else if (id === '00939') latestPrice = 14;
+                        else if (id === '00679B' || id === '00687B') latestPrice = 30;
+                        else if (id === '00631L') latestPrice = 180;
+                        else if (id === '00632R') latestPrice = 3.5;
+                        else if (id.includes('A')) latestPrice = 15;
+                        else if (['SPY','VOO','QQQ'].includes(id)) latestPrice = 500;
+                        else if (id.includes('JPY')) latestPrice = 0.21;
+                        else if (id === 'GOLD') latestPrice = 2300;
+                        else if (id.includes('BTC')) latestPrice = 65000;
+                        else if (id.includes('ETH')) latestPrice = 3500;
                     }
-                    const cv=latestPrice*state.qty;
-                    overallMarketValue+=cv;
-                    const si=SECTOR_MAPPING[id]||{category:'其他資產',color:'#8b92a5'};
+                    
+                    const currentAssetValue = latestPrice * state.qty;
+                    overallMarketValue += currentAssetValue;
 
-                    // 市值占比
-                    if(!sectorValues[si.category]) sectorValues[si.category]={value:0,color:si.color};
-                    sectorValues[si.category].value+=cv;
-
-                    // 獲益占比：各產業未實現損益
-                    const unrealized=cv-(state.avgPrice*state.qty);
-                    const totalPnlForAsset=unrealized+state.realized;
-                    if(!sectorGains[si.category]) sectorGains[si.category]={value:0,color:si.color};
-                    sectorGains[si.category].value+=totalPnlForAsset;
+                    // 記錄到產業分類
+                    const sectorInfo = SECTOR_MAPPING[id] || { category: '其他資產', color: '#8b92a5' };
+                    if (!sectorValues[sectorInfo.category]) {
+                        sectorValues[sectorInfo.category] = { value: 0, color: sectorInfo.color };
+                    }
+                    sectorValues[sectorInfo.category].value += currentAssetValue;
                 }
             });
 
-            const unrealizedPnl=overallMarketValue-overallInvestedCost;
-            const totalPnl=unrealizedPnl+overallRealizedPnl;
-            const pct=overallInvestedCost>0?((totalPnl/overallInvestedCost)*100).toFixed(2):"0.00";
-            document.getElementById('totalMarketValue').innerText=`$${overallMarketValue.toLocaleString(undefined,{maximumFractionDigits:2})}`;
-            document.getElementById('totalInvestedCost').innerText=`$${overallInvestedCost.toLocaleString(undefined,{maximumFractionDigits:2})}`;
-            const pnlEl=document.getElementById('totalAssetPnl');
-            pnlEl.className=`summary-value ${totalPnl>=0?'pnl-text-up':'pnl-text-down'}`;
-            pnlEl.innerText=`${totalPnl>=0?'+':''}${totalPnl.toLocaleString(undefined,{maximumFractionDigits:2})} (${totalPnl>=0?'+':''}${pct}%)`;
+            const unrealizedPnl = overallMarketValue - overallInvestedCost;
+            const totalPnl = unrealizedPnl + overallRealizedPnl;
+            const overallPnlPct = overallInvestedCost > 0 ? ((totalPnl / overallInvestedCost) * 100).toFixed(2) : "0.00";
 
-            // 渲染兩個圓餅圖
-            renderPieCharts(sectorValues, sectorGains);
+            document.getElementById('totalMarketValue').innerText = `$${overallMarketValue.toLocaleString(undefined, {maximumFractionDigits:2})}`;
+            document.getElementById('totalInvestedCost').innerText = `$${overallInvestedCost.toLocaleString(undefined, {maximumFractionDigits:2})}`;
+            
+            const pnlEl = document.getElementById('totalAssetPnl');
+            pnlEl.className = `summary-value ${totalPnl>=0?'pnl-text-up':'pnl-text-down'}`;
+            pnlEl.innerText = `${totalPnl>=0?'+':''}${totalPnl.toLocaleString(undefined, {maximumFractionDigits:2})} (${totalPnl>=0?'+':''}${overallPnlPct}%)`;
 
-            Object.keys(chartInstances).forEach(id=>{ if(chartInstances[id]) chartInstances[id].render(); });
+            // 繪製右側產業占比圖
+            renderSectorChart(sectorValues, overallMarketValue);
+
+            Object.keys(chartInstances).forEach(id => {
+                if (chartInstances[id]) chartInstances[id].render();
+            });
+        }
+
+        function renderSectorChart(sectorValues, totalMarketValue) {
+            const container = document.getElementById('sectorListContainer');
+            if (totalMarketValue <= 0) {
+                container.innerHTML = '<div style="color: var(--text-secondary); text-align: center; margin-top: 20px;">尚無持有庫存，無法分析產業佔比。</div>';
+                return;
+            }
+
+            // 將物件轉成陣列並按價值排序
+            const sortedSectors = Object.keys(sectorValues)
+                .map(key => ({
+                    name: key,
+                    value: sectorValues[key].value,
+                    color: sectorValues[key].color,
+                    percent: ((sectorValues[key].value / totalMarketValue) * 100).toFixed(1)
+                }))
+                .sort((a, b) => b.value - a.value);
+
+            container.innerHTML = sortedSectors.map(s => `
+                <div class="sector-item">
+                    <div class="sector-info">
+                        <span style="color: var(--text-color);">${s.name}</span>
+                        <span>${s.percent}% <span class="sector-val">($${s.value.toLocaleString(undefined, {maximumFractionDigits:0})})</span></span>
+                    </div>
+                    <div class="sector-bar-bg">
+                        <div class="sector-bar-fill" style="width: 0%; background: ${s.color};"></div>
+                    </div>
+                </div>
+            `).join('');
+
+            // 添加動畫效果
+            setTimeout(() => {
+                const fills = container.querySelectorAll('.sector-bar-fill');
+                sortedSectors.forEach((s, idx) => {
+                    if (fills[idx]) fills[idx].style.width = s.percent + '%';
+                });
+            }, 50);
         }
 
         window.deleteHistoryRecord = function(recordId) {
-            showCustomModal({ type:'confirm', title:'⚠️ 刪除確認', message:'確定要刪除這筆交易紀錄嗎？<br><br><span style="color:var(--bull-color);font-size:14px;">(提示：刪除後將無法復原資料，持倉成本會重新計算)</span>',
-                onConfirm:()=>{ tradeHistory=tradeHistory.filter(t=>t.id!==recordId); localStorage.setItem('userTradeHistory',JSON.stringify(tradeHistory)); refreshDashboardBackend(); selectedAssets.forEach(a=>{ if(chartInstances[a.id]) chartInstances[a.id].render(); }); }
+            showCustomModal({
+                type: 'confirm',
+                title: '⚠️ 刪除確認',
+                message: '確定要刪除這筆交易紀錄嗎？<br><br><span style="color: var(--bull-color); font-size:14px;">(提示：刪除後將無法復原資料，持倉成本會重新計算)</span>',
+                onConfirm: () => {
+                    tradeHistory = tradeHistory.filter(t => t.id !== recordId);
+                    localStorage.setItem('userTradeHistory', JSON.stringify(tradeHistory));
+                    refreshDashboardBackend();
+                    selectedAssets.forEach(asset => {
+                        if(chartInstances[asset.id]) chartInstances[asset.id].render();
+                    });
+                }
             });
         };
 
         window.addAsset = function(id, name, type, priceId, qtyId, selectTypeId) {
-            const priceEl=document.getElementById(priceId), qtyEl=document.getElementById(qtyId);
-            const price=parseFloat(priceEl.value)||0, qty=parseFloat(qtyEl.value)||0;
-            const tradeType=document.getElementById(selectTypeId).value;
-            if(price>0&&qty>0){
-                const nr={id:'tr_'+Date.now()+Math.random().toString(36).substr(2,5),time:new Date().toLocaleString(),assetId:id,assetName:name,type:tradeType,price,qty};
-                tradeHistory.push(nr); localStorage.setItem('userTradeHistory',JSON.stringify(tradeHistory));
-                refreshDashboardBackend(); priceEl.value=''; qtyEl.value='';
+            const priceEl = document.getElementById(priceId);
+            const qtyEl = document.getElementById(qtyId);
+            const price = parseFloat(priceEl.value) || 0;
+            const qty = parseFloat(qtyEl.value) || 0;
+            const tradeType = document.getElementById(selectTypeId).value; 
+
+            if (price > 0 && qty > 0) {
+                const newRecord = {
+                    id: 'tr_' + Date.now() + Math.random().toString(36).substr(2, 5),
+                    time: new Date().toLocaleString(),
+                    assetId: id, assetName: name, type: tradeType, price: price, qty: qty
+                };
+                tradeHistory.push(newRecord);
+                localStorage.setItem('userTradeHistory', JSON.stringify(tradeHistory));
+                refreshDashboardBackend();
+                
+                priceEl.value = ''; qtyEl.value = '';
             }
-            if(selectedAssets.some(a=>a.id===id)){ if(chartInstances[id]) chartInstances[id].render(); return; }
-            if(selectedAssets.length>=maxLimit) return;
-            selectedAssets.push({id,name,type});
-            document.querySelectorAll('.search-input').forEach(el=>el.value='');
-            document.querySelectorAll('.cost-field').forEach(el=>el.value='');
+
+            if (selectedAssets.some(a => a.id === id)) {
+                if (chartInstances[id]) chartInstances[id].render();
+                return;
+            }
+
+            if (selectedAssets.length >= maxLimit) return;
+            selectedAssets.push({ id, name, type });
+            
+            document.querySelectorAll('.search-input').forEach(el => el.value = '');
+            document.querySelectorAll('.cost-field').forEach(el => el.value = '');
             updateUI();
         };
 
         function updateUI() {
-            document.getElementById('assetCounter').innerText=`已選: ${selectedAssets.length} / ${maxLimit}`;
-            const grid=document.getElementById('chartsGrid');
-            const cids=selectedAssets.map(a=>a.id);
-            Array.from(grid.children).forEach(card=>{ const id=card.getAttribute('data-id'); if(!cids.includes(id)){ grid.removeChild(card); if(chartInstances[id]){chartInstances[id].remove();delete chartInstances[id];} } });
-            selectedAssets.forEach(asset=>{
-                let card=document.getElementById(`card-${asset.id}`);
-                if(!card){
-                    card=document.createElement('div'); card.className='chart-card'; card.id=`card-${asset.id}`; card.setAttribute('data-id',asset.id);
-                    card.innerHTML=`<div class="chart-header"><div class="header-left-zone"><div class="title-row"><span class="chart-badge">${asset.id}</span><div class="chart-title">${asset.name}</div></div></div><div class="header-right-zone"><div class="btn-row"><div class="header-pnl-box" id="header-pnl-${asset.id}"></div><button class="remove-btn" onclick="removeAsset('${asset.id}')" title="移除此圖表">✕</button></div></div></div><div class="info-panel" id="info-panel-${asset.id}">載入中...</div><div class="ma-legend" id="ma-legend-${asset.id}"></div><div class="chart-container" id="chart-container-${asset.id}"></div><div class="x-axis-controls"><div class="time-selector"><button class="time-btn" onclick="changeTimeRange('${asset.id}',5,this)">1週</button><button class="time-btn" onclick="changeTimeRange('${asset.id}',20,this)">1個月</button><button class="time-btn active" onclick="changeTimeRange('${asset.id}',60,this)">1季</button><button class="time-btn" onclick="changeTimeRange('${asset.id}',120,this)">全部</button></div><div class="custom-date-container"><input type="date" id="start-date-${asset.id}" class="date-input" onchange="handleCustomDateChange('${asset.id}')"><span style="color:var(--text-secondary);font-size:16px;font-weight:bold;"> - </span><input type="date" id="end-date-${asset.id}" class="date-input" onchange="handleCustomDateChange('${asset.id}')"></div></div>`;
-                    grid.appendChild(card);
-                    setTimeout(()=>{
-                        const container=document.getElementById('chart-container-'+asset.id);
-                        if(container){ const chart=CustomMiniChart.createChart(container,asset.id); chartInstances[asset.id]=chart; if(asset.type==='stock') chart.init('stock',generateMockStockData(asset.id)); else chart.init('line',generateMockForexData(asset.id)); }
-                    },10);
+            const currentCount = selectedAssets.length;
+            document.getElementById('assetCounter').innerText = `已選: ${currentCount} / ${maxLimit}`;
+
+            const chartsGrid = document.getElementById('chartsGrid');
+            const currentIds = selectedAssets.map(a => a.id);
+            
+            Array.from(chartsGrid.children).forEach(card => {
+                const id = card.getAttribute('data-id');
+                if (!currentIds.includes(id)) {
+                    chartsGrid.removeChild(card);
+                    if (chartInstances[id]) { chartInstances[id].remove(); delete chartInstances[id]; }
+                }
+            });
+
+            selectedAssets.forEach(asset => {
+                let card = document.getElementById(`card-${asset.id}`);
+                if (!card) {
+                    card = document.createElement('div'); card.className = 'chart-card';
+                    card.id = `card-${asset.id}`; card.setAttribute('data-id', asset.id);
+                    card.innerHTML = `
+                        <div class="chart-header">
+                            <div class="header-left-zone">
+                                <div class="title-row"><span class="chart-badge">${asset.id}</span><div class="chart-title">${asset.name}</div></div>
+                            </div>
+                            <div class="header-right-zone">
+                                <div class="btn-row"><div class="header-pnl-box" id="header-pnl-${asset.id}"></div><button class="remove-btn" onclick="removeAsset('${asset.id}')" title="移除此圖表">✕</button></div>
+                            </div>
+                        </div>
+                        <div class="info-panel" id="info-panel-${asset.id}">載入中...</div>
+                        <div class="ma-legend" id="ma-legend-${asset.id}"></div>
+                        <div class="chart-container" id="chart-container-${asset.id}"></div>
+                        
+                        <div class="x-axis-controls">
+                            <div class="time-selector">
+                                <button class="time-btn" onclick="changeTimeRange('${asset.id}', 5, this)">1週</button>
+                                <button class="time-btn" onclick="changeTimeRange('${asset.id}', 20, this)">1個月</button>
+                                <button class="time-btn active" onclick="changeTimeRange('${asset.id}', 60, this)">1季</button>
+                                <button class="time-btn" onclick="changeTimeRange('${asset.id}', 120, this)">全部</button>
+                            </div>
+                            <div class="custom-date-container">
+                                <input type="date" id="start-date-${asset.id}" class="date-input" onchange="handleCustomDateChange('${asset.id}')">
+                                <span style="color:var(--text-secondary); font-size:16px; font-weight:bold;"> - </span>
+                                <input type="date" id="end-date-${asset.id}" class="date-input" onchange="handleCustomDateChange('${asset.id}')">
+                            </div>
+                        </div>
+                    `;
+                    chartsGrid.appendChild(card);
+                    setTimeout(() => {
+                        const container = document.getElementById('chart-container-' + asset.id);
+                        if(container) {
+                            const chart = CustomMiniChart.createChart(container, asset.id); chartInstances[asset.id] = chart;
+                            if (asset.type === 'stock') chart.init('stock', generateMockStockData(asset.id));
+                            else chart.init('line', generateMockForexData(asset.id));
+                        }
+                    }, 10);
                 }
             });
             refreshDashboardBackend();
         }
 
-        window.removeAsset   = function(id){ selectedAssets=selectedAssets.filter(a=>a.id!==id); updateUI(); };
-        window.changeTimeRange = function(id,days,btnEl){ btnEl.parentNode.querySelectorAll('.time-btn').forEach(b=>b.classList.remove('active')); btnEl.classList.add('active'); document.getElementById(`start-date-${id}`).value=''; document.getElementById(`end-date-${id}`).value=''; if(chartInstances[id]) chartInstances[id].setFilterDays(days); };
-        window.handleCustomDateChange = function(id){ const s=document.getElementById(`start-date-${id}`).value,e=document.getElementById(`end-date-${id}`).value; const bc=document.getElementById(`start-date-${id}`).closest('.x-axis-controls'); if(!s&&!e){if(bc){const qb=bc.querySelectorAll('.time-btn')[2];if(qb)qb.classList.add('active');}if(chartInstances[id])chartInstances[id].setFilterDays(60);return;} if(bc)bc.querySelectorAll('.time-btn').forEach(b=>b.classList.remove('active')); if(chartInstances[id])chartInstances[id].setCustomDateRange(s,e); };
-        window.selectItemToInput = function(inputId,dropId,priceId,fullText){ const input=document.getElementById(inputId); input.value=fullText; document.getElementById(dropId).style.display='none'; document.getElementById(priceId).focus(); };
+        window.removeAsset = function(id) { selectedAssets = selectedAssets.filter(a => a.id !== id); updateUI(); };
+        
+        window.changeTimeRange = function(id, days, btnEl) {
+            btnEl.parentNode.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active')); 
+            btnEl.classList.add('active');
+            document.getElementById(`start-date-${id}`).value = '';
+            document.getElementById(`end-date-${id}`).value = '';
+            if (chartInstances[id]) chartInstances[id].setFilterDays(days);
+        };
 
-        function bindSearchFactory(inputId,dropId,priceId,qtyId,selectTypeId,btnId,dataSource,type){
-            const input=document.getElementById(inputId),drop=document.getElementById(dropId),priceIn=document.getElementById(priceId),qtyIn=document.getElementById(qtyId),typeSelect=document.getElementById(selectTypeId),btn=document.getElementById(btnId);
-            input.addEventListener('input',()=>{ const v=input.value.trim().toLowerCase(); if(!v){drop.style.display='none';return;} const m=dataSource.filter(s=>s.id.toLowerCase().includes(v)||s.name.toLowerCase().includes(v)); if(m.length>0){drop.innerHTML=m.map(s=>`<div class="dropdown-item" onclick="selectItemToInput('${inputId}','${dropId}','${priceId}','${s.id} ${s.name}')"><span class="item-id">${s.id}</span><span class="item-name">${s.name}</span></div>`).join('');drop.style.display='block';}else drop.style.display='none'; });
-            input.addEventListener('keydown',e=>{ if(e.key==='Enter'){const v=input.value.trim().toLowerCase();if(!v)return;let m=dataSource.find(s=>`${s.id} ${s.name}`.toLowerCase()===v);if(!m)m=dataSource.find(s=>s.id.toLowerCase().includes(v)||s.name.toLowerCase().includes(v));if(m)selectItemToInput(inputId,dropId,priceId,`${m.id} ${m.name}`);}});
-            const submitData=()=>{ const v=input.value.trim().toLowerCase();if(!v)return;let m=dataSource.find(s=>`${s.id} ${s.name}`.toLowerCase()===v);if(!m)m=dataSource.find(s=>s.id.toLowerCase().includes(v)||s.name.toLowerCase().includes(v));if(m)addAsset(m.id,m.name,type,priceId,qtyId,selectTypeId); };
-            [priceIn,qtyIn,typeSelect].forEach(el=>{ el.addEventListener('keydown',e=>{ if(e.key==='Enter')submitData(); }); });
-            btn.addEventListener('click',submitData);
-            document.addEventListener('click',e=>{ if(e.target!==input)drop.style.display='none'; });
+        window.handleCustomDateChange = function(id) {
+            const start = document.getElementById(`start-date-${id}`).value; 
+            const end = document.getElementById(`end-date-${id}`).value;
+            const btnContainer = document.getElementById(`start-date-${id}`).closest('.x-axis-controls');
+            
+            if (!start && !end) {
+                if (btnContainer) {
+                    const qBtn = btnContainer.querySelectorAll('.time-btn')[2]; 
+                    if (qBtn) qBtn.classList.add('active');
+                }
+                if (chartInstances[id]) chartInstances[id].setFilterDays(60);
+                return;
+            }
+
+            if (btnContainer) btnContainer.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+            if (chartInstances[id]) chartInstances[id].setCustomDateRange(start, end);
+        };
+        
+        window.selectItemToInput = function(inputId, dropId, priceId, fullText) {
+            const input = document.getElementById(inputId);
+            input.value = fullText; 
+            document.getElementById(dropId).style.display = 'none';
+            document.getElementById(priceId).focus(); 
+        };
+
+        function bindSearchFactory(inputId, dropId, priceId, qtyId, selectTypeId, btnId, dataSource, type) {
+            const input = document.getElementById(inputId); 
+            const drop = document.getElementById(dropId);
+            const priceIn = document.getElementById(priceId);
+            const qtyIn = document.getElementById(qtyId);
+            const typeSelect = document.getElementById(selectTypeId);
+            const btn = document.getElementById(btnId);
+
+            input.addEventListener('input', () => {
+                const val = input.value.trim().toLowerCase(); if (!val) { drop.style.display = 'none'; return; }
+                const matches = dataSource.filter(s => s.id.toLowerCase().includes(val) || s.name.toLowerCase().includes(val));
+                if (matches.length > 0) {
+                    drop.innerHTML = matches.map(s => `
+                        <div class="dropdown-item" onclick="selectItemToInput('${inputId}', '${dropId}', '${priceId}', '${s.id} ${s.name}')">
+                            <span class="item-id">${s.id}</span><span class="item-name">${s.name}</span>
+                        </div>
+                    `).join('');
+                    drop.style.display = 'block';
+                } else drop.style.display = 'none';
+            });
+            
+            input.addEventListener('keydown', (e) => { 
+                if (e.key === 'Enter') {
+                    const val = input.value.trim().toLowerCase(); if (!val) return;
+                    let match = dataSource.find(s => `${s.id} ${s.name}`.toLowerCase() === val);
+                    if (!match) match = dataSource.find(s => s.id.toLowerCase().includes(val) || s.name.toLowerCase().includes(val));
+                    if (match) selectItemToInput(inputId, dropId, priceId, `${match.id} ${match.name}`);
+                }
+            });
+
+            const submitData = () => {
+                const val = input.value.trim().toLowerCase(); if (!val) return;
+                let match = dataSource.find(s => `${s.id} ${s.name}`.toLowerCase() === val);
+                if (!match) match = dataSource.find(s => s.id.toLowerCase().includes(val) || s.name.toLowerCase().includes(val));
+                if (match) addAsset(match.id, match.name, type, priceId, qtyId, selectTypeId);
+            };
+
+            [priceIn, qtyIn, typeSelect].forEach(el => {
+                el.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitData(); });
+            });
+            btn.addEventListener('click', submitData);
+            document.addEventListener('click', (e) => { if (e.target !== input) drop.style.display = 'none'; });
         }
 
         window.onload = function() {
-            bindSearchFactory('searchTwStock','dropTwStock','costPriceTwStock','costQtyTwStock','typeTwStock','btnTwStock',TW_STOCKS,'stock');
-            bindSearchFactory('searchTwEtf','dropTwEtf','costPriceTwEtf','costQtyTwEtf','typeTwEtf','btnTwEtf',TW_ETFS,'stock');
-            bindSearchFactory('searchUsStock','dropUsStock','costPriceUsStock','costQtyUsStock','typeUsStock','btnUsStock',US_STOCKS,'stock');
-            bindSearchFactory('searchForex','dropForex','costPriceForex','costQtyForex','typeForex','btnForex',FOREX_DATA,'line');
+            bindSearchFactory('searchTwStock', 'dropTwStock', 'costPriceTwStock', 'costQtyTwStock', 'typeTwStock', 'btnTwStock', TW_STOCKS, 'stock');
+            bindSearchFactory('searchTwEtf', 'dropTwEtf', 'costPriceTwEtf', 'costQtyTwEtf', 'typeTwEtf', 'btnTwEtf', TW_ETFS, 'stock');
+            bindSearchFactory('searchUsStock', 'dropUsStock', 'costPriceUsStock', 'costQtyUsStock', 'typeUsStock', 'btnUsStock', US_STOCKS, 'stock');
+            bindSearchFactory('searchForex', 'dropForex', 'costPriceForex', 'costQtyForex', 'typeForex', 'btnForex', FOREX_DATA, 'line');
+
             refreshDashboardBackend();
             updateUI();
         };
