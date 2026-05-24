@@ -49,7 +49,6 @@
         .header-left h2 { font-size: 22px; letter-spacing: 1px; margin: 0; }
         .counter { background-color: rgba(41, 121, 255, 0.15); color: var(--primary-blue); padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; border: 1px solid rgba(41, 121, 255, 0.3); }
         
-        /* 群組下拉選單與操作區塊 */
         .group-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
         .group-select-wrapper { position: relative; display: flex; align-items: center; }
         .group-select { padding: 10px 14px; font-size: 15px; font-weight: bold; border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-color); outline: none; cursor: pointer; min-width: 150px; }
@@ -81,8 +80,10 @@
         .action-btn:hover { filter: brightness(1.1); }
         .action-btn:active { transform: scale(0.95); }
         
-        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 24px; }
+        /* 強制上二下二「田」字型排版 */
+        .charts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 24px; }
         .chart-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; position: relative; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 100%; }
+        
         .chart-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 16px 20px 10px 20px; gap: 12px; }
         .header-left-zone { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
         .title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -161,7 +162,8 @@
         .modal-btn-confirm { background: var(--primary-blue); color: #fff; }
         .modal-btn-confirm:hover { filter: brightness(1.1); }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
+            .charts-grid { grid-template-columns: 1fr; } /* 平板跟手機變成單直排 */
             .dashboard-content { grid-template-columns: 1fr; }
             .pie-charts-row { flex-direction: column; gap: 24px; }
             .pie-col:first-child { border-right: none; border-bottom: 1px solid var(--border-color); padding-bottom: 24px; }
@@ -475,14 +477,21 @@
         // ====== 取得真實 Yahoo Finance 資料 (透過 Vercel 後端 API) ======
         async function fetchRealMarketData(assetId, type) {
             let symbol = assetId;
-            if (/^[0-9]{4,6}$/.test(assetId)) symbol = `${assetId}.TW`; 
-            else if (assetId.includes('A')) symbol = `${assetId}.TW`; 
+            
+            // 判斷是否為台股/ETF (全部為數字，或是前面數字最後帶一個英文字母，如 00631L)
+            if (/^[0-9]{4,6}$/.test(assetId) || /^[0-9]{4,6}[A-Za-z]$/.test(assetId)) {
+                symbol = `${assetId}.TW`; 
+            }
             else if (assetId === 'USD/TWD') symbol = 'TWD=X';
             else if (assetId === 'JPY/TWD') symbol = 'JPYTWD=X';
+            else if (assetId === 'EUR/TWD') symbol = 'EURTWD=X';
+            else if (assetId === 'EUR/USD') symbol = 'EURUSD=X';
+            else if (assetId === 'GBP/USD') symbol = 'GBPUSD=X';
             else if (assetId === 'GOLD') symbol = 'GC=F';
+            else if (assetId === 'SILVER') symbol = 'SI=F';
+            else if (assetId === 'OIL') symbol = 'CL=F';
 
             try {
-                // 向 Vercel 的 Serverless Function 拿取整理好的陣列資料
                 const res = await fetch(`/api/stock?symbol=${symbol}`);
                 if (!res.ok) throw new Error('API 請求失敗');
                 const data = await res.json();
@@ -534,7 +543,6 @@
                         this.type = type;
                         let rawData = await fetchRealMarketData(assetId, type);
                         
-                        // 若抓不到或有報錯，退回模擬資料
                         if (!rawData || rawData.length === 0 || rawData.error) {
                             console.warn("真實資料抓取失敗，載入備用模擬資料");
                             rawData = generateFallbackData(assetId, type);
@@ -653,18 +661,58 @@
             }
         };
 
-        // ====== 資料配置與其餘業務邏輯 ======
+        // ====== 全面擴充商品清單 ======
         const SECTOR_MAPPING = {
-            '2330': { category: '科技與半導體', color: '#2979ff' }, '2317': { category: '科技與半導體', color: '#2979ff' }, '2454': { category: '科技與半導體', color: '#2979ff' },
-            'AAPL': { category: '科技與半導體', color: '#2979ff' }, 'MSFT': { category: '科技與半導體', color: '#2979ff' }, 'NVDA': { category: '科技與半導體', color: '#2979ff' },
-            'TSLA': { category: '電動車與能源', color: '#10b981' }, '2881': { category: '金融保險', color: '#f59e0b' },
-            '0050': { category: '大盤型 ETF', color: '#8b5cf6' }, '0056': { category: '高息型 ETF', color: '#ec4899' }, '00878':{ category: '高息型 ETF', color: '#ec4899' }, '00919':{ category: '高息型 ETF', color: '#ec4899' },
-            'USD/TWD':{ category: '外匯與貴金屬', color: '#eab308' }, 'JPY/TWD':{ category: '外匯與貴金屬', color: '#eab308' }, 'GOLD':   { category: '外匯與貴金屬', color: '#eab308' }
+            '2330': { category: '科技與半導體', color: '#2979ff' }, '2317': { category: '科技與半導體', color: '#2979ff' }, 
+            '2454': { category: '科技與半導體', color: '#2979ff' }, '2308': { category: '科技與半導體', color: '#2979ff' },
+            '2382': { category: '科技與半導體', color: '#2979ff' }, '3231': { category: '科技與半導體', color: '#2979ff' },
+            '2357': { category: '科技與半導體', color: '#2979ff' }, 
+            '2881': { category: '金融保險', color: '#f59e0b' }, '2891': { category: '金融保險', color: '#f59e0b' },
+            '2603': { category: '航運鋼鐵塑化', color: '#8b5cf6' }, '2002': { category: '航運鋼鐵塑化', color: '#8b5cf6' }, '1301': { category: '航運鋼鐵塑化', color: '#8b5cf6' },
+            
+            'AAPL': { category: '美股科技巨頭', color: '#ec4899' }, 'MSFT': { category: '美股科技巨頭', color: '#ec4899' }, 
+            'NVDA': { category: '美股科技巨頭', color: '#ec4899' }, 'GOOGL': { category: '美股科技巨頭', color: '#ec4899' },
+            'AMZN': { category: '美股科技巨頭', color: '#ec4899' }, 'META': { category: '美股科技巨頭', color: '#ec4899' },
+            'AMD': { category: '美股科技巨頭', color: '#ec4899' }, 'INTC': { category: '美股科技巨頭', color: '#ec4899' }, 'AVGO': { category: '美股科技巨頭', color: '#ec4899' },
+            'NFLX': { category: '美股科技巨頭', color: '#ec4899' },
+            'TSLA': { category: '電動車與能源', color: '#10b981' }, 
+            'SPY': { category: '大盤型 ETF', color: '#8b5cf6' }, 'QQQ': { category: '大盤型 ETF', color: '#8b5cf6' },
+            
+            '0050': { category: '大盤型 ETF', color: '#8b5cf6' }, '006208': { category: '大盤型 ETF', color: '#8b5cf6' },
+            '00631L': { category: '槓桿與反向 ETF', color: '#ef4444' }, '00632R': { category: '槓桿與反向 ETF', color: '#ef4444' },
+            '0056': { category: '高息型 ETF', color: '#ec4899' }, '00878':{ category: '高息型 ETF', color: '#ec4899' }, 
+            '00919':{ category: '高息型 ETF', color: '#ec4899' }, '00929':{ category: '高息型 ETF', color: '#ec4899' },
+            '00713':{ category: '高息型 ETF', color: '#ec4899' }, '00939':{ category: '高息型 ETF', color: '#ec4899' }, '00940':{ category: '高息型 ETF', color: '#ec4899' },
+            
+            'USD/TWD':{ category: '外匯與貴金屬', color: '#eab308' }, 'JPY/TWD':{ category: '外匯與貴金屬', color: '#eab308' }, 
+            'EUR/TWD':{ category: '外匯與貴金屬', color: '#eab308' }, 'EUR/USD':{ category: '外匯與貴金屬', color: '#eab308' }, 'GBP/USD':{ category: '外匯與貴金屬', color: '#eab308' },
+            'GOLD':   { category: '外匯與貴金屬', color: '#eab308' }, 'SILVER': { category: '外匯與貴金屬', color: '#eab308' }, 'OIL': { category: '原油能源', color: '#10b981' }
         };
-        const TW_STOCKS = [{id:'2330',name:'台積電'},{id:'2317',name:'鴻海'},{id:'2454',name:'聯發科'},{id:'2881',name:'富邦金'}];
-        const TW_ETFS   = [{id:'0050',name:'元大台灣50'},{id:'0056',name:'元大高股息'},{id:'00878',name:'國泰永續高股息'},{id:'00919',name:'群益台灣精選高息'}];
-        const US_STOCKS = [{id:'AAPL',name:'Apple (蘋果)'},{id:'MSFT',name:'Microsoft (微軟)'},{id:'NVDA',name:'NVIDIA (輝達)'},{id:'TSLA',name:'Tesla (特斯拉)'}];
-        const FOREX_DATA= [{id:'USD/TWD',name:'美元 (USD)'},{id:'JPY/TWD',name:'日圓 (JPY)'},{id:'GOLD',name:'黃金 (Gold)'}];
+
+        const TW_STOCKS = [
+            {id:'2330',name:'台積電'},{id:'2317',name:'鴻海'},{id:'2454',name:'聯發科'},{id:'2881',name:'富邦金'},
+            {id:'2308',name:'台達電'},{id:'2891',name:'中信金'},{id:'2603',name:'長榮'},{id:'2382',name:'廣達'},
+            {id:'3231',name:'緯創'},{id:'2357',name:'華碩'},{id:'1301',name:'台塑'},{id:'2002',name:'中鋼'}
+        ];
+        const TW_ETFS = [
+            {id:'0050',name:'元大台灣50'},{id:'0056',name:'元大高股息'},{id:'00878',name:'國泰永續高股息'},
+            {id:'00919',name:'群益台灣精選高息'},{id:'00929',name:'復華台灣科技優息'},{id:'00713',name:'元大台灣高息低波'},
+            {id:'006208',name:'富邦台50'},{id:'00631L',name:'元大台灣50正2'},{id:'00632R',name:'元大台灣50反1'},
+            {id:'00939',name:'統一台灣高息動能'},{id:'00940',name:'元大台灣價值高息'}
+        ];
+        const US_STOCKS = [
+            {id:'AAPL',name:'Apple (蘋果)'},{id:'MSFT',name:'Microsoft (微軟)'},{id:'NVDA',name:'NVIDIA (輝達)'},
+            {id:'TSLA',name:'Tesla (特斯拉)'},{id:'GOOGL',name:'Alphabet (谷歌)'},{id:'AMZN',name:'Amazon (亞馬遜)'},
+            {id:'META',name:'Meta (臉書)'},{id:'AMD',name:'AMD (超微)'},{id:'INTC',name:'Intel (英特爾)'},
+            {id:'AVGO',name:'Broadcom (博通)'},{id:'NFLX',name:'Netflix (網飛)'},{id:'SPY',name:'SPDR S&P 500 ETF'},
+            {id:'QQQ',name:'Invesco QQQ Trust'}
+        ];
+        const FOREX_DATA= [
+            {id:'USD/TWD',name:'美元/台幣 (USD/TWD)'},{id:'JPY/TWD',name:'日圓/台幣 (JPY/TWD)'},
+            {id:'EUR/TWD',name:'歐元/台幣 (EUR/TWD)'},{id:'EUR/USD',name:'歐元/美元 (EUR/USD)'},
+            {id:'GBP/USD',name:'英鎊/美元 (GBP/USD)'},{id:'GOLD',name:'黃金 (Gold)'},
+            {id:'SILVER',name:'白銀 (Silver)'},{id:'OIL',name:'原油 (WTI Crude)'}
+        ];
 
         const maxLimit = 4; let chartInstances = {};
         let tradeHistory = JSON.parse(localStorage.getItem('userTradeHistory')) || [];
