@@ -74,12 +74,17 @@
         .chart-title { font-size: 18px; font-weight: 600; color: var(--text-color); }
         .chart-badge { background: var(--bg-color); color: var(--text-secondary); font-size: 13px; padding: 4px 8px; border-radius: 6px; font-family: monospace; border: 1px solid var(--border-color); }
         .header-right-zone { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-        .btn-row { display: flex; align-items: center; gap: 12px; }
+        .btn-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap;}
         
         .indicator-select { background: var(--input-bg); color: var(--primary-blue); border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 6px; font-size: 13px; font-weight: bold; outline: none; cursor: pointer; }
         .indicator-select:focus { border-color: var(--primary-blue); }
+        
+        /* 參數輸入框樣式 */
+        .param-inputs { display: inline-flex; gap: 4px; align-items: center; }
+        .indicator-param { width: 45px; padding: 2px 4px; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--primary-blue); font-weight: bold; border-radius: 4px; font-size: 13px; text-align: center; outline: none; transition: 0.2s; }
+        .indicator-param:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 2px var(--primary-glow); }
 
-        .remove-btn { background: none; border: none; color: var(--text-secondary); font-size: 20px; cursor: pointer; font-weight: bold; }
+        .remove-btn { background: none; border: none; color: var(--text-secondary); font-size: 20px; cursor: pointer; font-weight: bold; margin-left: 6px; }
         .remove-btn:hover { color: var(--bull-color); }
         .header-pnl-box { font-size: 14px; font-weight: bold; padding: 6px 10px; border-radius: 6px; background: rgba(128, 128, 128, 0.05); border: 1px solid var(--border-color); text-align: right; }
         .header-pnl-box.earn { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); }
@@ -101,8 +106,6 @@
         .time-btn:last-child { border-right: none; }
         .time-btn:hover { background: var(--hover-bg); color: var(--text-color); }
         .time-btn.active { background: var(--primary-glow); color: var(--primary-blue); font-weight: bold; }
-        .custom-date-container { display: flex; align-items: center; gap: 6px; width: 100%; justify-content: space-between; }
-        .date-input { flex: 1; background: var(--panel-bg); border: 1px solid var(--border-color); color: var(--text-color); padding: 8px 10px; border-radius: 6px; outline: none; font-size: 14px; color-scheme: dark light; }
 
         .dashboard-panel { background-color: var(--panel-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
         .dashboard-title { font-size: 20px; font-weight: bold; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--text-color); }
@@ -307,7 +310,6 @@
     </div>
 
     <script>
-        // ====== Modal ======
         function showCustomModal(options) {
             const modal = document.getElementById('customModal');
             const titleEl = document.getElementById('modalTitle');
@@ -327,7 +329,6 @@
             modal.classList.add('show');
         }
 
-        // ====== 圓餅圖 ======
         let pieValueInstance = null; let pieGainInstance  = null;
         function destroyPieCharts() { if (pieValueInstance) { pieValueInstance.destroy(); pieValueInstance = null; } if (pieGainInstance) { pieGainInstance.destroy(); pieGainInstance = null; } }
         function buildPieChart(canvasId, legendId, items, emptyMsg) {
@@ -345,12 +346,10 @@
             pieValueInstance = buildPieChart('pieValueChart', 'pieValueLegend', valueItems, '尚無持倉資料'); pieGainInstance = buildPieChart('pieGainChart', 'pieGainLegend', gainItems, '尚無獲益產業資料');
         }
 
-        // ====== 主題 ======
         let currentTheme = localStorage.getItem('userTheme') || 'dark'; document.documentElement.setAttribute('data-theme', currentTheme); updateThemeBtnUI();
         function toggleTheme() { currentTheme = currentTheme === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', currentTheme); localStorage.setItem('userTheme', currentTheme); updateThemeBtnUI(); Object.keys(chartInstances).forEach(id => { if (chartInstances[id]) chartInstances[id].render(); }); }
         function updateThemeBtnUI() { document.getElementById('themeBtn').innerHTML = currentTheme === 'light' ? '🌞 淺色' : '🌙 深色'; }
 
-        // ====== 動態群組管理 ======
         const MAX_GROUPS = 20; let groupsData = JSON.parse(localStorage.getItem('userDynamicGroups')) || [{ id: 'g_default', name: '我的群組一', assets: [] }];
         let currentGroupId = localStorage.getItem('currentGroupId') || groupsData[0].id; let selectedAssets = [];
         if (!groupsData.find(g => g.id === currentGroupId)) currentGroupId = groupsData[0].id;
@@ -362,7 +361,6 @@
         function saveCurrentGroup() { const group = groupsData.find(g => g.id === currentGroupId); group.assets = [...selectedAssets]; localStorage.setItem('userDynamicGroups', JSON.stringify(groupsData)); showCustomModal({ type: 'alert', title: '✅ 儲存成功', message: `目前的標的已成功儲存！` }); }
         function deleteCurrentGroup() { if (groupsData.length <= 1) { showCustomModal({ type: 'alert', title: '⚠️ 無法刪除', message: '至少需要保留一個群組喔！' }); return; } const group = groupsData.find(g => g.id === currentGroupId); showCustomModal({ type: 'confirm', title: '🗑️ 刪除群組確認', message: `確定要刪除 <b>【${group.name}】</b> 嗎？`, onConfirm: () => { groupsData = groupsData.filter(g => g.id !== currentGroupId); localStorage.setItem('userDynamicGroups', JSON.stringify(groupsData)); currentGroupId = groupsData[0].id; localStorage.setItem('currentGroupId', currentGroupId); updateGroupSelectUI(); loadSelectedGroup(); } }); }
 
-        // ====== 取得真實資料 ======
         async function fetchRealMarketData(assetId, type, interval = '1d') {
             let symbol = assetId;
             if (/^[0-9]{4,6}$/.test(assetId) || /^[0-9]{4,6}[A-Za-z]$/.test(assetId)) symbol = `${assetId}.TW`; 
@@ -378,13 +376,12 @@
             } catch (error) { console.error("API 請求錯誤:", error); return null; }
         }
 
-        // ====== 通道與技術指標計算邏輯 ======
+        // ====== 通道與技術指標公式 ======
         function calcMA(data, index, period) { if (index < period-1) return null; let s=0; for(let j=0;j<period;j++) s+=data[index-j].close; return s/period; }
         function calcStdDev(data, index, period, ma) { if (index < period-1) return null; let s=0; for(let j=0;j<period;j++) { let diff = data[index-j].close - ma; s += diff*diff; } return Math.sqrt(s/period); }
         function calcMaxHigh(data, index, period) { if (index < period-1) return null; let m = -Infinity; for(let j=0;j<period;j++) if(data[index-j].high > m) m = data[index-j].high; return m; }
         function calcMinLow(data, index, period) { if (index < period-1) return null; let m = Infinity; for(let j=0;j<period;j++) if(data[index-j].low < m) m = data[index-j].low; return m; }
 
-        // ====== K線圖核心渲染邏輯 ======
         const CustomMiniChart = {
             createChart: function(container, assetId) {
                 const canvas = document.createElement('canvas'); canvas.style.width='100%'; canvas.style.height='100%'; canvas.style.display='block';
@@ -400,41 +397,66 @@
                         this.loadingOverlay.style.display = 'flex'; this.type = type; this.currentInterval = interval;
                         let rawData = await fetchRealMarketData(assetId, type, interval);
                         if (!rawData || rawData.length === 0 || rawData.error) { console.warn("抓取失敗"); this.loadingOverlay.style.display = 'none'; return; }
-
-                        if (type === 'stock') {
-                            let ema20 = null;
-                            rawData.forEach((d, i) => {
-                                // 1. 基本均線 MA
-                                d.ma5 = calcMA(rawData, i, 5); d.ma10 = calcMA(rawData, i, 10); d.ma20 = calcMA(rawData, i, 20);
-                                // 2. 布林通道 BB (20, 2)
-                                if (d.ma20) {
-                                    let sd = calcStdDev(rawData, i, 20, d.ma20);
-                                    d.bb_up = d.ma20 + 2*sd; d.bb_dn = d.ma20 - 2*sd; d.bb_mid = d.ma20;
-                                }
-                                // 3. 價格通道 Price Channel (20)
-                                let pc_h = calcMaxHigh(rawData, i, 20); let pc_l = calcMinLow(rawData, i, 20);
-                                if (pc_h && pc_l) { d.pc_up = pc_h; d.pc_dn = pc_l; d.pc_mid = (pc_h + pc_l) / 2; }
-                                // 4. 肯特納通道 KC (EMA20, ATR10) - 先算 EMA 和 TR
-                                if (i === 0) { d.tr = d.high - d.low; }
-                                else { d.tr = Math.max(d.high - d.low, Math.abs(d.high - rawData[i-1].close), Math.abs(d.low - rawData[i-1].close)); }
-                                
-                                if (i === 19) { ema20 = calcMA(rawData, i, 20); d.ema20 = ema20; }
-                                else if (i > 19) { ema20 = d.close * (2/21) + ema20 * (1 - 2/21); d.ema20 = ema20; }
-                            });
-
-                            // 計算 ATR 並完成 KC
-                            rawData.forEach((d, i) => {
-                                if (i >= 19) {
-                                    let trSum = 0; for(let j=0; j<10; j++) trSum += rawData[i-j].tr; // 10週期ATR
-                                    d.atr = trSum / 10;
-                                    if(d.ema20) { d.kc_up = d.ema20 + 2*d.atr; d.kc_dn = d.ema20 - 2*d.atr; d.kc_mid = d.ema20; }
-                                }
-                            });
-                        }
-                        this.fullData = rawData; this.displayData = this.fullData; this.setupEvents();
+                        
+                        this.fullData = rawData; 
+                        
+                        // 嘗試抓取畫面上已經輸入的參數，如果剛載入就用預設值 20, 2
+                        const p1Input = document.getElementById(`param1-${assetId}`);
+                        const p2Input = document.getElementById(`param2-${assetId}`);
+                        const p1 = p1Input ? (parseFloat(p1Input.value) || 20) : 20;
+                        const p2 = p2Input ? (parseFloat(p2Input.value) || 2) : 2;
+                        
+                        this.recalcIndicators(p1, p2);
+                        
+                        this.displayData = this.fullData; this.setupEvents();
                         this.loadingOverlay.style.display = 'none'; this.render();
                     },
-                    setIndicator(ind) { this.activeIndicator = ind; this.render(); },
+                    
+                    // 核心：動態將公式帶入陣列計算
+                    recalcIndicators(p1, p2) {
+                        if (this.type !== 'stock') return;
+                        let ema = null;
+                        this.fullData.forEach((d, i) => {
+                            // 先清空舊的通道數據
+                            d.bb_up=null; d.bb_dn=null; d.bb_mid=null; d.kc_up=null; d.kc_dn=null; d.kc_mid=null; d.pc_up=null; d.pc_dn=null; d.pc_mid=null;
+                            
+                            // 保留基本的均線
+                            d.ma5 = calcMA(this.fullData, i, 5); d.ma10 = calcMA(this.fullData, i, 10); d.ma20 = calcMA(this.fullData, i, 20);
+                            
+                            if (this.activeIndicator === 'BB') {
+                                let ma = calcMA(this.fullData, i, p1);
+                                if (ma) { let sd = calcStdDev(this.fullData, i, p1, ma); d.bb_up = ma + p2*sd; d.bb_dn = ma - p2*sd; d.bb_mid = ma; }
+                            } else if (this.activeIndicator === 'PC') {
+                                let pc_h = calcMaxHigh(this.fullData, i, p1); let pc_l = calcMinLow(this.fullData, i, p1);
+                                if (pc_h && pc_l) { d.pc_up = pc_h; d.pc_dn = pc_l; d.pc_mid = (pc_h + pc_l) / 2; }
+                            } else if (this.activeIndicator === 'KC') {
+                                 if (i === 0) d.tr = d.high - d.low;
+                                 else d.tr = Math.max(d.high - d.low, Math.abs(d.high - this.fullData[i-1].close), Math.abs(d.low - this.fullData[i-1].close));
+                                 let alpha = 2 / (p1 + 1);
+                                 if (i === p1 - 1) { ema = calcMA(this.fullData, i, p1); d.ema = ema; }
+                                 else if (i > p1 - 1) { ema = d.close * alpha + ema * (1 - alpha); d.ema = ema; }
+                                 
+                                 if (i >= p1 - 1) {
+                                     let trSum = 0; for(let j=0; j<p1; j++) trSum += this.fullData[i-j].tr; d.atr = trSum / p1;
+                                     if(d.ema) { d.kc_up = d.ema + p2*d.atr; d.kc_dn = d.ema - p2*d.atr; d.kc_mid = d.ema; }
+                                 }
+                            }
+                        });
+                    },
+                    
+                    setIndicator(ind) { 
+                        this.activeIndicator = ind; 
+                        const p1 = parseFloat(document.getElementById(`param1-${assetId}`).value) || 20;
+                        const p2 = parseFloat(document.getElementById(`param2-${assetId}`).value) || 2;
+                        
+                        const p2El = document.getElementById(`param2-${assetId}`);
+                        if(ind==='MA' || ind==='PC') p2El.style.display = 'none'; 
+                        else p2El.style.display = 'inline-block';
+                        
+                        this.recalcIndicators(p1, p2);
+                        this.render(); 
+                    },
+                    
                     render() {
                         let hoverIdx = -1; const pL=10, pR=75, pT=15, pB=25;
                         if (this.width>0 && this.displayData.length>0) {
@@ -458,7 +480,6 @@
                             if (this.type==='stock') {
                                 if(d.low<minVal) minVal=d.low; if(d.high>maxVal) maxVal=d.high;
                                 if(d.volume>maxVol) maxVol=d.volume;
-                                // 擴展 Y 軸以容納通道
                                 if (this.activeIndicator === 'BB' && d.bb_up) { maxVal = Math.max(maxVal, d.bb_up); minVal = Math.min(minVal, d.bb_dn); }
                                 if (this.activeIndicator === 'KC' && d.kc_up) { maxVal = Math.max(maxVal, d.kc_up); minVal = Math.min(minVal, d.kc_dn); }
                                 if (this.activeIndicator === 'PC' && d.pc_up) { maxVal = Math.max(maxVal, d.pc_up); minVal = Math.min(minVal, d.pc_dn); }
@@ -495,13 +516,11 @@
                         if (this.type==='stock') {
                             ctx.beginPath(); ctx.moveTo(pL,vTopY); ctx.lineTo(this.width-pR,vTopY); ctx.stroke();
                             
-                            // 畫通道
                             if (this.activeIndicator === 'BB') { drawFill('bb_up','bb_dn','rgba(66, 165, 245, 0.1)'); drawLine('bb_up','#4facfe'); drawLine('bb_dn','#4facfe'); drawLine('bb_mid','#ffb129',true); }
                             else if (this.activeIndicator === 'KC') { drawFill('kc_up','kc_dn','rgba(156, 39, 176, 0.1)'); drawLine('kc_up','#b620e0'); drawLine('kc_dn','#b620e0'); drawLine('kc_mid','#ffb129',true); }
                             else if (this.activeIndicator === 'PC') { drawFill('pc_up','pc_dn','rgba(38, 166, 154, 0.1)'); drawLine('pc_up','#26a69a'); drawLine('pc_dn','#26a69a'); drawLine('pc_mid','#ffb129',true); }
                             else { drawLine('ma5','#4facfe'); drawLine('ma10','#b620e0'); drawLine('ma20','#ffb129'); }
 
-                            // 畫 K 棒
                             this.displayData.forEach((d,idx) => {
                                 const x=pL+idx*step; const isUp=d.close>=d.open; const color=isUp?bullColor:bearColor;
                                 ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=1.5;
@@ -619,8 +638,8 @@
                 let card=document.getElementById(`card-${asset.id}`);
                 if(!card){
                     card=document.createElement('div'); card.className='chart-card'; card.id=`card-${asset.id}`; card.setAttribute('data-id',asset.id);
-                    // 右上角加入通道指標切換下拉選單
-                    card.innerHTML=`<div class="chart-header"><div class="header-left-zone"><div class="title-row"><span class="chart-badge">${asset.id}</span><div class="chart-title">${asset.name}</div></div></div><div class="header-right-zone"><div class="btn-row"><select class="indicator-select" onchange="changeIndicator('${asset.id}', this.value)"><option value="MA">均線 (MA)</option><option value="BB">布林通道 (BB)</option><option value="KC">肯特納通道 (KC)</option><option value="PC">價格通道 (PC)</option></select><div class="header-pnl-box" id="header-pnl-${asset.id}"></div><button class="remove-btn" onclick="removeAsset('${asset.id}')" title="移除此圖表">✕</button></div></div></div><div class="info-panel" id="info-panel-${asset.id}">載入中...</div><div class="ma-legend" id="ma-legend-${asset.id}"></div><div class="chart-container" id="chart-container-${asset.id}"></div><div class="x-axis-controls"><div class="time-selector"><button class="time-btn" onclick="changeInterval('${asset.id}','15m',this)">15分</button><button class="time-btn" onclick="changeInterval('${asset.id}','30m',this)">30分</button><button class="time-btn" onclick="changeInterval('${asset.id}','1h',this)">1小時</button><button class="time-btn active" onclick="changeInterval('${asset.id}','1d',this)">日線</button><button class="time-btn" onclick="changeInterval('${asset.id}','1wk',this)">周線</button></div></div>`;
+                    // 這裡加入了參數輸入框
+                    card.innerHTML=`<div class="chart-header"><div class="header-left-zone"><div class="title-row"><span class="chart-badge">${asset.id}</span><div class="chart-title">${asset.name}</div></div></div><div class="header-right-zone"><div class="btn-row"><select class="indicator-select" onchange="changeIndicator('${asset.id}', this.value)"><option value="MA">均線 (MA)</option><option value="BB">布林通道 (BB)</option><option value="KC">肯特納通道 (KC)</option><option value="PC">價格通道 (PC)</option></select><div class="param-inputs"><input type="number" class="indicator-param" id="param1-${asset.id}" value="20" title="週期 (如20日)" onchange="updateIndicatorParams('${asset.id}')"><input type="number" class="indicator-param" id="param2-${asset.id}" value="2" title="倍數 (如2倍標準差)" step="0.1" onchange="updateIndicatorParams('${asset.id}')" style="display:none;"></div><div class="header-pnl-box" id="header-pnl-${asset.id}"></div><button class="remove-btn" onclick="removeAsset('${asset.id}')" title="移除此圖表">✕</button></div></div></div><div class="info-panel" id="info-panel-${asset.id}">載入中...</div><div class="ma-legend" id="ma-legend-${asset.id}"></div><div class="chart-container" id="chart-container-${asset.id}"></div><div class="x-axis-controls"><div class="time-selector"><button class="time-btn" onclick="changeInterval('${asset.id}','15m',this)">15分</button><button class="time-btn" onclick="changeInterval('${asset.id}','30m',this)">30分</button><button class="time-btn" onclick="changeInterval('${asset.id}','1h',this)">1小時</button><button class="time-btn active" onclick="changeInterval('${asset.id}','1d',this)">日線</button><button class="time-btn" onclick="changeInterval('${asset.id}','1wk',this)">周線</button></div></div>`;
                     grid.appendChild(card);
                     setTimeout(()=>{ const container=document.getElementById('chart-container-'+asset.id); if(container){ const chart = CustomMiniChart.createChart(container,asset.id); chartInstances[asset.id] = chart; chart.loadRealData(asset.type, '1d').then(() => refreshDashboardBackend()); } }, 10);
                 }
@@ -631,6 +650,17 @@
         window.removeAsset = function(id){ selectedAssets=selectedAssets.filter(a=>a.id!==id); updateUI(); };
         window.changeInterval = function(id, interval, btnEl) { btnEl.parentNode.querySelectorAll('.time-btn').forEach(b=>b.classList.remove('active')); btnEl.classList.add('active'); if(chartInstances[id]) chartInstances[id].loadRealData(chartInstances[id].type, interval).then(() => refreshDashboardBackend()); };
         window.changeIndicator = function(id, indicator) { if(chartInstances[id]) chartInstances[id].setIndicator(indicator); };
+        
+        // 觸發重新計算公式的事件
+        window.updateIndicatorParams = function(id) {
+            if(chartInstances[id]) {
+                const p1 = parseFloat(document.getElementById(`param1-${id}`).value) || 20;
+                const p2 = parseFloat(document.getElementById(`param2-${id}`).value) || 2;
+                chartInstances[id].recalcIndicators(p1, p2);
+                chartInstances[id].render();
+            }
+        };
+
         window.selectItemToInput = function(inputId,dropId,priceId,fullText){ document.getElementById(inputId).value=fullText; document.getElementById(dropId).style.display='none'; document.getElementById(priceId).focus(); };
 
         function bindSearchFactory(inputId,dropId,priceId,qtyId,selectTypeId,btnId,dataSource,type){
