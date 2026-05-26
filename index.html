@@ -76,9 +76,10 @@
         .chart-title { font-size: 18px; font-weight: 600; color: var(--text-color); }
         .chart-badge { background: var(--bg-color); color: var(--text-secondary); font-size: 13px; padding: 4px 8px; border-radius: 6px; font-family: monospace; border: 1px solid var(--border-color); }
         .header-right-zone { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-        .btn-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap;}
         
-        /* 柔和版選單與參數輸入框樣式 */
+        /* 修正按鈕列太擠的問題，把 gap 拉大 */
+        .btn-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;}
+        
         .indicator-select { background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 6px; font-size: 13px; font-weight: normal; outline: none; cursor: pointer; transition: 0.2s; }
         .indicator-select:hover { border-color: var(--text-secondary); }
         .indicator-select:focus { border-color: var(--text-secondary); }
@@ -87,12 +88,14 @@
         .indicator-param { width: 45px; padding: 2px 4px; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); font-weight: normal; border-radius: 4px; font-size: 13px; text-align: center; outline: none; transition: 0.2s; }
         .indicator-param:focus { border-color: var(--text-secondary); box-shadow: 0 0 0 2px rgba(154, 162, 181, 0.2); }
         
-        /* 金黃色警報輸入框 */
-        .indicator-param.alert-input { width: 65px; border-color: rgba(234, 179, 8, 0.3); color: var(--alert-gold); }
+        /* 稍微拉寬警報框 */
+        .indicator-param.alert-input { width: 85px; padding: 2px 6px; border-color: rgba(234, 179, 8, 0.3); color: var(--alert-gold); }
         .indicator-param.alert-input:focus { border-color: var(--alert-gold); box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.2); }
 
-        .remove-btn { background: none; border: none; color: var(--text-secondary); font-size: 20px; cursor: pointer; font-weight: bold; margin-left: 6px; }
+        /* 拉開刪除按鈕距離 */
+        .remove-btn { background: none; border: none; color: var(--text-secondary); font-size: 20px; cursor: pointer; font-weight: bold; margin-left: 12px; }
         .remove-btn:hover { color: var(--bull-color); }
+
         .header-pnl-box { font-size: 14px; font-weight: bold; padding: 6px 10px; border-radius: 6px; background: rgba(128, 128, 128, 0.05); border: 1px solid var(--border-color); text-align: right; }
         .header-pnl-box.earn { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); }
         .header-pnl-box.loss { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); }
@@ -151,7 +154,7 @@
         .custom-modal-overlay.show .custom-modal-box { transform: translateY(0); }
         .custom-modal-title { font-size: 18px; font-weight: bold; margin-bottom: 12px; color: var(--text-color); }
         .custom-modal-msg { font-size: 15px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.5; }
-        .custom-modal-input { width: 100%; padding: 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-size: 15px; outline: none; margin-bottom: 20px; display: none; }
+        .custom-modal-input { width: 100%; padding: 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-size: 15px; outline: none; margin-bottom: 20px; }
         .custom-modal-input:focus { border-color: var(--primary-blue); }
         .custom-modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
         .modal-btn { padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; }
@@ -160,7 +163,6 @@
         .modal-btn-confirm { background: var(--primary-blue); color: #fff; }
         .modal-btn-confirm:hover { filter: brightness(1.1); }
 
-        /* 問題回饋表單專屬樣式 */
         .form-label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; text-align: left; font-weight: 600; }
         .form-textarea { width: 100%; padding: 10px; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 6px; font-size: 14px; outline: none; resize: none; height: 100px; margin-bottom: 12px; transition: 0.2s; }
         .form-textarea:focus { border-color: var(--primary-blue); }
@@ -185,7 +187,7 @@
         <div class="custom-modal-box">
             <div class="custom-modal-title" id="modalTitle">提示</div>
             <div class="custom-modal-msg" id="modalMsg"></div>
-            <input type="text" class="custom-modal-input" id="modalInput">
+            <input type="text" class="custom-modal-input" id="modalInput" style="display:none;">
             <div class="custom-modal-actions">
                 <button class="modal-btn modal-btn-cancel" id="modalCancelBtn">取消</button>
                 <button class="modal-btn modal-btn-confirm" id="modalConfirmBtn">確定</button>
@@ -193,24 +195,18 @@
         </div>
     </div>
 
-    <div class="custom-modal-overlay" id="contactModal">
+    <div class="custom-modal-overlay" id="settingsModal">
         <div class="custom-modal-box">
-            <div class="custom-modal-title">📬 聯絡與問題回饋</div>
+            <div class="custom-modal-title">⚙️ 系統設定</div>
+            <div class="custom-modal-msg">請輸入您的 LINE Notify Token，設定後價格警報將自動發送至您的 LINE。</div>
             <div style="margin-bottom: 12px;">
-                <label class="form-label">您的聯絡信箱</label>
-                <input type="email" id="contactEmail" class="search-input" placeholder="example@gmail.com" style="text-align: left;">
+                <label class="form-label">LINE Notify Token</label>
+                <input type="password" id="lineTokenInput" class="custom-modal-input" placeholder="貼上 Token" style="display:block; width:100%; margin-bottom: 0;">
+                <a href="https://notify-bot.line.me/zh_TW/" target="_blank" style="font-size: 12px; color: var(--primary-blue); text-decoration: none; display: block; margin-top: 6px;">👉 點此前往申請 LINE Token</a>
             </div>
-            <div style="margin-bottom: 12px;">
-                <label class="form-label">主旨</label>
-                <input type="text" id="contactSubject" class="search-input" placeholder="請輸入主旨" style="text-align: left;">
-            </div>
-            <div>
-                <label class="form-label">內容描述</label>
-                <textarea id="contactMessage" class="form-textarea" placeholder="請輸入您想反應的問題或建議..."></textarea>
-            </div>
-            <div class="custom-modal-actions">
-                <button class="modal-btn modal-btn-cancel" onclick="closeContactModal()">取消</button>
-                <button class="modal-btn modal-btn-confirm" id="contactSubmitBtn" onclick="submitContactForm()">確認送出</button>
+            <div class="custom-modal-actions" style="margin-top: 20px;">
+                <button class="modal-btn modal-btn-cancel" onclick="closeSettingsModal()">取消</button>
+                <button class="modal-btn modal-btn-confirm" onclick="saveSettings()">儲存設定</button>
             </div>
         </div>
     </div>
@@ -229,7 +225,7 @@
                 <button class="group-action-btn" onclick="createNewGroup()" title="新增群組">➕ 新增</button>
                 <button class="group-action-btn" onclick="renameCurrentGroup()" title="重新命名">✏️ 命名</button>
                 <button class="group-action-btn" onclick="saveCurrentGroup()" title="儲存目前畫面標的">💾 儲存</button>
-                <button class="group-action-btn" onclick="openContactModal()" title="聯絡回饋信箱">📬 聯絡回饋</button>
+                <button class="group-action-btn" onclick="openSettingsModal()" title="系統設定">⚙️ 設定</button>
                 <button class="group-action-btn delete" onclick="deleteCurrentGroup()" title="刪除群組">🗑️ 刪除</button>
             </div>
         </div>
@@ -365,55 +361,36 @@
             modal.classList.add('show');
         }
 
-        // ====== 問題回饋聯絡表單控制 ======
-        function openContactModal() { document.getElementById('contactModal').classList.add('show'); }
-        function closeContactModal() { document.getElementById('contactModal').classList.remove('show'); }
-        async function submitContactForm() {
-            const email = document.getElementById('contactEmail').value.trim();
-            const subject = document.getElementById('contactSubject').value.trim();
-            const message = document.getElementById('contactMessage').value.trim();
-            const btn = document.getElementById('contactSubmitBtn');
-            if(!email || !subject || !message) { alert('請填寫所有欄位喔！'); return; }
-            
-            btn.innerText = '📡 傳送中...'; btn.disabled = true;
-            try {
-                const res = await fetch('/api/send-mail', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type: 'contact', email, subject, message })
-                });
-                if(res.ok) {
-                    alert('📬 信件已成功送出！將會儘快回覆您。');
-                    document.getElementById('contactSubject').value = '';
-                    document.getElementById('contactMessage').value = '';
-                    closeContactModal();
-                } else { throw new Error('發信失敗'); }
-            } catch(e) { alert('❌ 發信系統出錯了，請稍後再試。'); }
-            btn.innerText = '確認送出'; btn.disabled = false;
+        // ====== 系統設定 (LINE Token) ======
+        function openSettingsModal() { 
+            document.getElementById('settingsModal').classList.add('show'); 
+            const savedToken = localStorage.getItem('userLineToken') || '';
+            document.getElementById('lineTokenInput').value = savedToken;
+        }
+        function closeSettingsModal() { document.getElementById('settingsModal').classList.remove('show'); }
+        function saveSettings() {
+            const token = document.getElementById('lineTokenInput').value.trim();
+            localStorage.setItem('userLineToken', token);
+            closeSettingsModal();
+            showCustomModal({ type: 'alert', title: '✅ 設定成功', message: 'LINE Notify Token 已儲存至您的瀏覽器！' });
         }
 
-        // ====== 價格警報設定邏輯 ======
+        // ====== 價格警報設定邏輯 (改發 LINE) ======
         let priceAlerts = JSON.parse(localStorage.getItem('userPriceAlerts')) || {};
         window.updatePriceAlertValue = function(id) {
             const val = parseFloat(document.getElementById(`alert-${id}`).value);
             if(!val || val <= 0) { delete priceAlerts[id]; localStorage.setItem('userPriceAlerts', JSON.stringify(priceAlerts)); return; }
             
-            // 抓取目前最新收盤價，用來自動判斷是「向上突破」還是「向下突破」警報
             let curPrice = 0;
             if(chartInstances[id] && chartInstances[id].fullData.length > 0) {
                 const lastIdx = chartInstances[id].fullData.length - 1;
                 curPrice = chartInstances[id].fullData[lastIdx].close || chartInstances[id].fullData[lastIdx].value;
             }
             
-            priceAlerts[id] = {
-                target: val,
-                direction: curPrice < val ? 'up' : 'down',
-                triggered: false
-            };
+            priceAlerts[id] = { target: val, direction: curPrice < val ? 'up' : 'down', triggered: false };
             localStorage.setItem('userPriceAlerts', JSON.stringify(priceAlerts));
         };
 
-        // 檢查報價是否觸發警報
         async function checkPriceAlertTrigger(id, currentPrice) {
             const alertConfig = priceAlerts[id];
             if (!alertConfig || alertConfig.triggered) return;
@@ -423,22 +400,26 @@
             if (alertConfig.direction === 'down' && currentPrice <= alertConfig.target) shouldTrigger = true;
 
             if (shouldTrigger) {
-                alertConfig.triggered = true; // 防刷鎖定
+                alertConfig.triggered = true;
                 localStorage.setItem('userPriceAlerts', JSON.stringify(priceAlerts));
-                console.log(`🔔 觸發警報！正在發送郵件通知: ${id}`);
                 
+                const userToken = localStorage.getItem('userLineToken');
+                if(!userToken) {
+                    console.log('警報已觸發，但使用者未設定 LINE Token');
+                    return;
+                }
+
+                // 呼叫我們自己寫的 API 轉發給 LINE
                 try {
-                    await fetch('/api/send-mail', {
+                    await fetch('/api/line', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            type: 'alert',
-                            assetId: id,
-                            targetPrice: alertConfig.target,
-                            currentPrice: currentPrice
+                            token: userToken,
+                            message: `\n🚨 [資產監控警報]\n標的：${id}\n觸發條件：目標價 ${alertConfig.target}\n當前最新價：${currentPrice}\n請盡速回面板確認行情！`
                         })
                     });
-                } catch (err) { console.error("警報信發送失敗:", err); }
+                } catch (err) { console.error("LINE 發送失敗:", err); }
             }
         }
 
@@ -525,7 +506,6 @@
                         this.displayData = this.fullData; this.setupEvents();
                         this.loadingOverlay.style.display = 'none'; this.render();
 
-                        // 每次抓完新價格，自動核對是否觸發價格警報信
                         if(this.fullData.length > 0) {
                             const lastItem = this.fullData[this.fullData.length - 1];
                             const latestPrice = lastItem.close || lastItem.value;
@@ -752,11 +732,9 @@
                 if(!card){
                     card = document.createElement('div'); card.className = 'chart-card'; card.id = `card-${asset.id}`; card.setAttribute('data-id', asset.id);
                     
-                    // 讀取已經儲存的警報值
                     const alertVal = priceAlerts[asset.id] ? priceAlerts[asset.id].target : '';
                     
-                    // 這裡整合了舒服不刺眼的灰白色參數欄，以及最右邊的金黃色警報輸入框 🔔
-                    card.innerHTML = `<div class="chart-header"><div class="header-left-zone"><div class="title-row"><span class="chart-badge">${asset.id}</span><div class="chart-title">${asset.name}</div></div></div><div class="header-right-zone"><div class="btn-row"><select class="indicator-select" onchange="changeIndicator('${asset.id}', this.value)"><option value="MA">均線 (MA)</option><option value="BB">布林通道 (BB)</option><option value="KC">肯特納通道 (KC)</option><option value="PC">價格通道 (PC)</option></select><div class="param-inputs"><input type="number" class="indicator-param" id="param1-${asset.id}" value="20" title="週期" onchange="updateIndicatorParams('${asset.id}')"><input type="number" class="indicator-param" id="param2-${asset.id}" value="2" title="倍數" step="0.1" onchange="updateIndicatorParams('${asset.id}')" style="display:none;"><input type="number" class="indicator-param alert-input" id="alert-${asset.id}" value="${alertVal}" placeholder="🔔 警報價" title="當前報價觸及此金額時，會發送 Gmail 通知你喔" onchange="updatePriceAlertValue('${asset.id}')"></div><div class="header-pnl-box" id="header-pnl-${asset.id}"></div><button class="remove-btn" onclick="removeAsset('${asset.id}')" title="移除此圖表">✕</button></div></div></div><div class="info-panel" id="info-panel-${asset.id}">載入中...</div><div class="ma-legend" id="ma-legend-${asset.id}"></div><div class="chart-container" id="chart-container-${asset.id}"></div><div class="x-axis-controls"><div class="time-selector"><button class="time-btn" onclick="changeInterval('${asset.id}','15m',this)">15分</button><button class="time-btn" onclick="changeInterval('${asset.id}','30m',this)">30分</button><button class="time-btn" onclick="changeInterval('${asset.id}','1h',this)">1小時</button><button class="time-btn active" onclick="changeInterval('${asset.id}','1d',this)">日線</button><button class="time-btn" onclick="changeInterval('${asset.id}','1wk',this)">周線</button></div></div>`;
+                    card.innerHTML = `<div class="chart-header"><div class="header-left-zone"><div class="title-row"><span class="chart-badge">${asset.id}</span><div class="chart-title">${asset.name}</div></div></div><div class="header-right-zone"><div class="btn-row"><select class="indicator-select" onchange="changeIndicator('${asset.id}', this.value)"><option value="MA">均線 (MA)</option><option value="BB">布林通道 (BB)</option><option value="KC">肯特納通道 (KC)</option><option value="PC">價格通道 (PC)</option></select><div class="param-inputs"><input type="number" class="indicator-param" id="param1-${asset.id}" value="20" title="週期" onchange="updateIndicatorParams('${asset.id}')"><input type="number" class="indicator-param" id="param2-${asset.id}" value="2" title="倍數" step="0.1" onchange="updateIndicatorParams('${asset.id}')" style="display:none;"><input type="number" class="indicator-param alert-input" id="alert-${asset.id}" value="${alertVal}" placeholder="🔔 警報價" title="當前報價觸及此金額時，會發送 LINE 通知" onchange="updatePriceAlertValue('${asset.id}')"></div><div class="header-pnl-box" id="header-pnl-${asset.id}"></div><button class="remove-btn" onclick="removeAsset('${asset.id}')" title="移除此圖表">✕</button></div></div></div><div class="info-panel" id="info-panel-${asset.id}">載入中...</div><div class="ma-legend" id="ma-legend-${asset.id}"></div><div class="chart-container" id="chart-container-${asset.id}"></div><div class="x-axis-controls"><div class="time-selector"><button class="time-btn" onclick="changeInterval('${asset.id}','15m',this)">15分</button><button class="time-btn" onclick="changeInterval('${asset.id}','30m',this)">30分</button><button class="time-btn" onclick="changeInterval('${asset.id}','1h',this)">1小時</button><button class="time-btn active" onclick="changeInterval('${asset.id}','1d',this)">日線</button><button class="time-btn" onclick="changeInterval('${asset.id}','1wk',this)">周線</button></div></div>`;
                     grid.appendChild(card);
                     
                     setTimeout(() => { const container = document.getElementById('chart-container-'+asset.id); if(container){ const chart = CustomMiniChart.createChart(container, asset.id); chartInstances[asset.id] = chart; chart.loadRealData(asset.type, '1d').then(() => refreshDashboardBackend()); } }, 10);
