@@ -76,13 +76,14 @@
         .header-right-zone { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
         .btn-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap;}
         
-        .indicator-select { background: var(--input-bg); color: var(--primary-blue); border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 6px; font-size: 13px; font-weight: bold; outline: none; cursor: pointer; }
-        .indicator-select:focus { border-color: var(--primary-blue); }
+        /* 柔和版選單與參數輸入框樣式 */
+        .indicator-select { background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 6px; font-size: 13px; font-weight: normal; outline: none; cursor: pointer; transition: 0.2s; }
+        .indicator-select:hover { border-color: var(--text-secondary); }
+        .indicator-select:focus { border-color: var(--text-secondary); }
         
-        /* 參數輸入框樣式 */
         .param-inputs { display: inline-flex; gap: 4px; align-items: center; }
-        .indicator-param { width: 45px; padding: 2px 4px; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--primary-blue); font-weight: bold; border-radius: 4px; font-size: 13px; text-align: center; outline: none; transition: 0.2s; }
-        .indicator-param:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 2px var(--primary-glow); }
+        .indicator-param { width: 45px; padding: 2px 4px; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); font-weight: normal; border-radius: 4px; font-size: 13px; text-align: center; outline: none; transition: 0.2s; }
+        .indicator-param:focus { border-color: var(--text-secondary); box-shadow: 0 0 0 2px rgba(154, 162, 181, 0.2); }
 
         .remove-btn { background: none; border: none; color: var(--text-secondary); font-size: 20px; cursor: pointer; font-weight: bold; margin-left: 6px; }
         .remove-btn:hover { color: var(--bull-color); }
@@ -400,7 +401,6 @@
                         
                         this.fullData = rawData; 
                         
-                        // 嘗試抓取畫面上已經輸入的參數，如果剛載入就用預設值 20, 2
                         const p1Input = document.getElementById(`param1-${assetId}`);
                         const p2Input = document.getElementById(`param2-${assetId}`);
                         const p1 = p1Input ? (parseFloat(p1Input.value) || 20) : 20;
@@ -412,15 +412,12 @@
                         this.loadingOverlay.style.display = 'none'; this.render();
                     },
                     
-                    // 核心：動態將公式帶入陣列計算
                     recalcIndicators(p1, p2) {
                         if (this.type !== 'stock') return;
                         let ema = null;
                         this.fullData.forEach((d, i) => {
-                            // 先清空舊的通道數據
                             d.bb_up=null; d.bb_dn=null; d.bb_mid=null; d.kc_up=null; d.kc_dn=null; d.kc_mid=null; d.pc_up=null; d.pc_dn=null; d.pc_mid=null;
                             
-                            // 保留基本的均線
                             d.ma5 = calcMA(this.fullData, i, 5); d.ma10 = calcMA(this.fullData, i, 10); d.ma20 = calcMA(this.fullData, i, 20);
                             
                             if (this.activeIndicator === 'BB') {
@@ -638,7 +635,6 @@
                 let card=document.getElementById(`card-${asset.id}`);
                 if(!card){
                     card=document.createElement('div'); card.className='chart-card'; card.id=`card-${asset.id}`; card.setAttribute('data-id',asset.id);
-                    // 這裡加入了參數輸入框
                     card.innerHTML=`<div class="chart-header"><div class="header-left-zone"><div class="title-row"><span class="chart-badge">${asset.id}</span><div class="chart-title">${asset.name}</div></div></div><div class="header-right-zone"><div class="btn-row"><select class="indicator-select" onchange="changeIndicator('${asset.id}', this.value)"><option value="MA">均線 (MA)</option><option value="BB">布林通道 (BB)</option><option value="KC">肯特納通道 (KC)</option><option value="PC">價格通道 (PC)</option></select><div class="param-inputs"><input type="number" class="indicator-param" id="param1-${asset.id}" value="20" title="週期 (如20日)" onchange="updateIndicatorParams('${asset.id}')"><input type="number" class="indicator-param" id="param2-${asset.id}" value="2" title="倍數 (如2倍標準差)" step="0.1" onchange="updateIndicatorParams('${asset.id}')" style="display:none;"></div><div class="header-pnl-box" id="header-pnl-${asset.id}"></div><button class="remove-btn" onclick="removeAsset('${asset.id}')" title="移除此圖表">✕</button></div></div></div><div class="info-panel" id="info-panel-${asset.id}">載入中...</div><div class="ma-legend" id="ma-legend-${asset.id}"></div><div class="chart-container" id="chart-container-${asset.id}"></div><div class="x-axis-controls"><div class="time-selector"><button class="time-btn" onclick="changeInterval('${asset.id}','15m',this)">15分</button><button class="time-btn" onclick="changeInterval('${asset.id}','30m',this)">30分</button><button class="time-btn" onclick="changeInterval('${asset.id}','1h',this)">1小時</button><button class="time-btn active" onclick="changeInterval('${asset.id}','1d',this)">日線</button><button class="time-btn" onclick="changeInterval('${asset.id}','1wk',this)">周線</button></div></div>`;
                     grid.appendChild(card);
                     setTimeout(()=>{ const container=document.getElementById('chart-container-'+asset.id); if(container){ const chart = CustomMiniChart.createChart(container,asset.id); chartInstances[asset.id] = chart; chart.loadRealData(asset.type, '1d').then(() => refreshDashboardBackend()); } }, 10);
@@ -651,7 +647,6 @@
         window.changeInterval = function(id, interval, btnEl) { btnEl.parentNode.querySelectorAll('.time-btn').forEach(b=>b.classList.remove('active')); btnEl.classList.add('active'); if(chartInstances[id]) chartInstances[id].loadRealData(chartInstances[id].type, interval).then(() => refreshDashboardBackend()); };
         window.changeIndicator = function(id, indicator) { if(chartInstances[id]) chartInstances[id].setIndicator(indicator); };
         
-        // 觸發重新計算公式的事件
         window.updateIndicatorParams = function(id) {
             if(chartInstances[id]) {
                 const p1 = parseFloat(document.getElementById(`param1-${id}`).value) || 20;
