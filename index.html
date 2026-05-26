@@ -12,6 +12,7 @@
             --primary-blue: #2979ff; --primary-glow: rgba(41, 121, 255, 0.2);
             --border-color: #2a2e39; --input-bg: #0d0e12; --hover-bg: rgba(255, 255, 255, 0.05);
             --bull-color: #ff4d4f; --bear-color: #00e676; --modal-overlay: rgba(0, 0, 0, 0.7);
+            --alert-gold: #eab308;
         }
         [data-theme="light"] {
             --bg-color: #f3f4f6; --card-bg: #ffffff; --panel-bg: #ffffff;
@@ -19,6 +20,7 @@
             --primary-blue: #2563eb; --primary-glow: rgba(37, 99, 235, 0.2);
             --border-color: #e5e7eb; --input-bg: #f9fafb; --hover-bg: rgba(0, 0, 0, 0.05);
             --bull-color: #ef4444; --bear-color: #10b981; --modal-overlay: rgba(0, 0, 0, 0.4);
+            --alert-gold: #d97706;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.3s, border-color 0.3s; }
         body { background-color: var(--bg-color); color: var(--text-color); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 12px; font-size: 16px; overflow-x: hidden; }
@@ -84,6 +86,10 @@
         .param-inputs { display: inline-flex; gap: 4px; align-items: center; }
         .indicator-param { width: 45px; padding: 2px 4px; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); font-weight: normal; border-radius: 4px; font-size: 13px; text-align: center; outline: none; transition: 0.2s; }
         .indicator-param:focus { border-color: var(--text-secondary); box-shadow: 0 0 0 2px rgba(154, 162, 181, 0.2); }
+        
+        /* 金黃色警報輸入框 */
+        .indicator-param.alert-input { width: 65px; border-color: rgba(234, 179, 8, 0.3); color: var(--alert-gold); }
+        .indicator-param.alert-input:focus { border-color: var(--alert-gold); box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.2); }
 
         .remove-btn { background: none; border: none; color: var(--text-secondary); font-size: 20px; cursor: pointer; font-weight: bold; margin-left: 6px; }
         .remove-btn:hover { color: var(--bull-color); }
@@ -154,6 +160,11 @@
         .modal-btn-confirm { background: var(--primary-blue); color: #fff; }
         .modal-btn-confirm:hover { filter: brightness(1.1); }
 
+        /* 問題回饋表單專屬樣式 */
+        .form-label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; text-align: left; font-weight: 600; }
+        .form-textarea { width: 100%; padding: 10px; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 6px; font-size: 14px; outline: none; resize: none; height: 100px; margin-bottom: 12px; transition: 0.2s; }
+        .form-textarea:focus { border-color: var(--primary-blue); }
+
         @media (max-width: 1024px) {
             .charts-grid { grid-template-columns: 1fr; }
             .dashboard-content { grid-template-columns: 1fr; }
@@ -182,6 +193,28 @@
         </div>
     </div>
 
+    <div class="custom-modal-overlay" id="contactModal">
+        <div class="custom-modal-box">
+            <div class="custom-modal-title">📬 聯絡與問題回饋</div>
+            <div style="margin-bottom: 12px;">
+                <label class="form-label">您的聯絡信箱</label>
+                <input type="email" id="contactEmail" class="search-input" placeholder="example@gmail.com" style="text-align: left;">
+            </div>
+            <div style="margin-bottom: 12px;">
+                <label class="form-label">主旨</label>
+                <input type="text" id="contactSubject" class="search-input" placeholder="請輸入主旨" style="text-align: left;">
+            </div>
+            <div>
+                <label class="form-label">內容描述</label>
+                <textarea id="contactMessage" class="form-textarea" placeholder="請輸入您想反應的問題或建議..."></textarea>
+            </div>
+            <div class="custom-modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeContactModal()">取消</button>
+                <button class="modal-btn modal-btn-confirm" id="contactSubmitBtn" onclick="submitContactForm()">確認送出</button>
+            </div>
+        </div>
+    </div>
+
     <div class="control-panel">
         <div class="header-row">
             <div class="header-left">
@@ -196,6 +229,7 @@
                 <button class="group-action-btn" onclick="createNewGroup()" title="新增群組">➕ 新增</button>
                 <button class="group-action-btn" onclick="renameCurrentGroup()" title="重新命名">✏️ 命名</button>
                 <button class="group-action-btn" onclick="saveCurrentGroup()" title="儲存目前畫面標的">💾 儲存</button>
+                <button class="group-action-btn" onclick="openContactModal()" title="聯絡回饋信箱">📬 聯絡回饋</button>
                 <button class="group-action-btn delete" onclick="deleteCurrentGroup()" title="刪除群組">🗑️ 刪除</button>
             </div>
         </div>
@@ -311,6 +345,7 @@
     </div>
 
     <script>
+        // ====== Modal 管理 ======
         function showCustomModal(options) {
             const modal = document.getElementById('customModal');
             const titleEl = document.getElementById('modalTitle');
@@ -330,6 +365,84 @@
             modal.classList.add('show');
         }
 
+        // ====== 問題回饋聯絡表單控制 ======
+        function openContactModal() { document.getElementById('contactModal').classList.add('show'); }
+        function closeContactModal() { document.getElementById('contactModal').classList.remove('show'); }
+        async function submitContactForm() {
+            const email = document.getElementById('contactEmail').value.trim();
+            const subject = document.getElementById('contactSubject').value.trim();
+            const message = document.getElementById('contactMessage').value.trim();
+            const btn = document.getElementById('contactSubmitBtn');
+            if(!email || !subject || !message) { alert('請填寫所有欄位喔！'); return; }
+            
+            btn.innerText = '📡 傳送中...'; btn.disabled = true;
+            try {
+                const res = await fetch('/api/send-mail', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: 'contact', email, subject, message })
+                });
+                if(res.ok) {
+                    alert('📬 信件已成功送出！將會儘快回覆您。');
+                    document.getElementById('contactSubject').value = '';
+                    document.getElementById('contactMessage').value = '';
+                    closeContactModal();
+                } else { throw new Error('發信失敗'); }
+            } catch(e) { alert('❌ 發信系統出錯了，請稍後再試。'); }
+            btn.innerText = '確認送出'; btn.disabled = false;
+        }
+
+        // ====== 價格警報設定邏輯 ======
+        let priceAlerts = JSON.parse(localStorage.getItem('userPriceAlerts')) || {};
+        window.updatePriceAlertValue = function(id) {
+            const val = parseFloat(document.getElementById(`alert-${id}`).value);
+            if(!val || val <= 0) { delete priceAlerts[id]; localStorage.setItem('userPriceAlerts', JSON.stringify(priceAlerts)); return; }
+            
+            // 抓取目前最新收盤價，用來自動判斷是「向上突破」還是「向下突破」警報
+            let curPrice = 0;
+            if(chartInstances[id] && chartInstances[id].fullData.length > 0) {
+                const lastIdx = chartInstances[id].fullData.length - 1;
+                curPrice = chartInstances[id].fullData[lastIdx].close || chartInstances[id].fullData[lastIdx].value;
+            }
+            
+            priceAlerts[id] = {
+                target: val,
+                direction: curPrice < val ? 'up' : 'down',
+                triggered: false
+            };
+            localStorage.setItem('userPriceAlerts', JSON.stringify(priceAlerts));
+        };
+
+        // 檢查報價是否觸發警報
+        async function checkPriceAlertTrigger(id, currentPrice) {
+            const alertConfig = priceAlerts[id];
+            if (!alertConfig || alertConfig.triggered) return;
+
+            let shouldTrigger = false;
+            if (alertConfig.direction === 'up' && currentPrice >= alertConfig.target) shouldTrigger = true;
+            if (alertConfig.direction === 'down' && currentPrice <= alertConfig.target) shouldTrigger = true;
+
+            if (shouldTrigger) {
+                alertConfig.triggered = true; // 防刷鎖定
+                localStorage.setItem('userPriceAlerts', JSON.stringify(priceAlerts));
+                console.log(`🔔 觸發警報！正在發送郵件通知: ${id}`);
+                
+                try {
+                    await fetch('/api/send-mail', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            type: 'alert',
+                            assetId: id,
+                            targetPrice: alertConfig.target,
+                            currentPrice: currentPrice
+                        })
+                    });
+                } catch (err) { console.error("警報信發送失敗:", err); }
+            }
+        }
+
+        // ====== 圓餅圖 ======
         let pieValueInstance = null; let pieGainInstance  = null;
         function destroyPieCharts() { if (pieValueInstance) { pieValueInstance.destroy(); pieValueInstance = null; } if (pieGainInstance) { pieGainInstance.destroy(); pieGainInstance = null; } }
         function buildPieChart(canvasId, legendId, items, emptyMsg) {
@@ -347,10 +460,12 @@
             pieValueInstance = buildPieChart('pieValueChart', 'pieValueLegend', valueItems, '尚無持倉資料'); pieGainInstance = buildPieChart('pieGainChart', 'pieGainLegend', gainItems, '尚無獲益產業資料');
         }
 
+        // ====== 主題控制 ======
         let currentTheme = localStorage.getItem('userTheme') || 'dark'; document.documentElement.setAttribute('data-theme', currentTheme); updateThemeBtnUI();
         function toggleTheme() { currentTheme = currentTheme === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', currentTheme); localStorage.setItem('userTheme', currentTheme); updateThemeBtnUI(); Object.keys(chartInstances).forEach(id => { if (chartInstances[id]) chartInstances[id].render(); }); }
         function updateThemeBtnUI() { document.getElementById('themeBtn').innerHTML = currentTheme === 'light' ? '🌞 淺色' : '🌙 深色'; }
 
+        // ====== 群組管理 ======
         const MAX_GROUPS = 20; let groupsData = JSON.parse(localStorage.getItem('userDynamicGroups')) || [{ id: 'g_default', name: '我的群組一', assets: [] }];
         let currentGroupId = localStorage.getItem('currentGroupId') || groupsData[0].id; let selectedAssets = [];
         if (!groupsData.find(g => g.id === currentGroupId)) currentGroupId = groupsData[0].id;
@@ -362,6 +477,7 @@
         function saveCurrentGroup() { const group = groupsData.find(g => g.id === currentGroupId); group.assets = [...selectedAssets]; localStorage.setItem('userDynamicGroups', JSON.stringify(groupsData)); showCustomModal({ type: 'alert', title: '✅ 儲存成功', message: `目前的標的已成功儲存！` }); }
         function deleteCurrentGroup() { if (groupsData.length <= 1) { showCustomModal({ type: 'alert', title: '⚠️ 無法刪除', message: '至少需要保留一個群組喔！' }); return; } const group = groupsData.find(g => g.id === currentGroupId); showCustomModal({ type: 'confirm', title: '🗑️ 刪除群組確認', message: `確定要刪除 <b>【${group.name}】</b> 嗎？`, onConfirm: () => { groupsData = groupsData.filter(g => g.id !== currentGroupId); localStorage.setItem('userDynamicGroups', JSON.stringify(groupsData)); currentGroupId = groupsData[0].id; localStorage.setItem('currentGroupId', currentGroupId); updateGroupSelectUI(); loadSelectedGroup(); } }); }
 
+        // ====== 抓取市場資料 ======
         async function fetchRealMarketData(assetId, type, interval = '1d') {
             let symbol = assetId;
             if (/^[0-9]{4,6}$/.test(assetId) || /^[0-9]{4,6}[A-Za-z]$/.test(assetId)) symbol = `${assetId}.TW`; 
@@ -377,7 +493,6 @@
             } catch (error) { console.error("API 請求錯誤:", error); return null; }
         }
 
-        // ====== 通道與技術指標公式 ======
         function calcMA(data, index, period) { if (index < period-1) return null; let s=0; for(let j=0;j<period;j++) s+=data[index-j].close; return s/period; }
         function calcStdDev(data, index, period, ma) { if (index < period-1) return null; let s=0; for(let j=0;j<period;j++) { let diff = data[index-j].close - ma; s += diff*diff; } return Math.sqrt(s/period); }
         function calcMaxHigh(data, index, period) { if (index < period-1) return null; let m = -Infinity; for(let j=0;j<period;j++) if(data[index-j].high > m) m = data[index-j].high; return m; }
@@ -407,9 +522,15 @@
                         const p2 = p2Input ? (parseFloat(p2Input.value) || 2) : 2;
                         
                         this.recalcIndicators(p1, p2);
-                        
                         this.displayData = this.fullData; this.setupEvents();
                         this.loadingOverlay.style.display = 'none'; this.render();
+
+                        // 每次抓完新價格，自動核對是否觸發價格警報信
+                        if(this.fullData.length > 0) {
+                            const lastItem = this.fullData[this.fullData.length - 1];
+                            const latestPrice = lastItem.close || lastItem.value;
+                            checkPriceAlertTrigger(assetId, latestPrice);
+                        }
                     },
                     
                     recalcIndicators(p1, p2) {
@@ -417,7 +538,6 @@
                         let ema = null;
                         this.fullData.forEach((d, i) => {
                             d.bb_up=null; d.bb_dn=null; d.bb_mid=null; d.kc_up=null; d.kc_dn=null; d.kc_mid=null; d.pc_up=null; d.pc_dn=null; d.pc_mid=null;
-                            
                             d.ma5 = calcMA(this.fullData, i, 5); d.ma10 = calcMA(this.fullData, i, 10); d.ma20 = calcMA(this.fullData, i, 20);
                             
                             if (this.activeIndicator === 'BB') {
@@ -445,7 +565,6 @@
                         this.activeIndicator = ind; 
                         const p1 = parseFloat(document.getElementById(`param1-${assetId}`).value) || 20;
                         const p2 = parseFloat(document.getElementById(`param2-${assetId}`).value) || 2;
-                        
                         const p2El = document.getElementById(`param2-${assetId}`);
                         if(ind==='MA' || ind==='PC') p2El.style.display = 'none'; 
                         else p2El.style.display = 'inline-block';
@@ -512,7 +631,6 @@
 
                         if (this.type==='stock') {
                             ctx.beginPath(); ctx.moveTo(pL,vTopY); ctx.lineTo(this.width-pR,vTopY); ctx.stroke();
-                            
                             if (this.activeIndicator === 'BB') { drawFill('bb_up','bb_dn','rgba(66, 165, 245, 0.1)'); drawLine('bb_up','#4facfe'); drawLine('bb_dn','#4facfe'); drawLine('bb_mid','#ffb129',true); }
                             else if (this.activeIndicator === 'KC') { drawFill('kc_up','kc_dn','rgba(156, 39, 176, 0.1)'); drawLine('kc_up','#b620e0'); drawLine('kc_dn','#b620e0'); drawLine('kc_mid','#ffb129',true); }
                             else if (this.activeIndicator === 'PC') { drawFill('pc_up','pc_dn','rgba(38, 166, 154, 0.1)'); drawLine('pc_up','#26a69a'); drawLine('pc_dn','#26a69a'); drawLine('pc_mid','#ffb129',true); }
@@ -526,9 +644,7 @@
                                 ctx.fillRect(x-bw/2,Math.min(getY(d.open),getY(d.close)),bw,Math.max(Math.abs(getY(d.close)-getY(d.open)),2));
                                 const vy=getVY(d.volume); ctx.fillRect(x-bw/2,vy,bw,vTopY+vH-vy);
                             });
-                        } else {
-                            drawLine('value', '#ffb129');
-                        }
+                        } else { drawLine('value', '#ffb129'); }
 
                         if (this.mouseX>=pL&&this.mouseX<=this.width-pR&&this.mouseY>=pT&&this.mouseY<=this.height-pB) {
                             ctx.strokeStyle=textColor; ctx.setLineDash([4,4]); const sx=hoverIdx!==-1?(pL+hoverIdx*step):this.mouseX;
@@ -573,7 +689,7 @@
             '2881': { category: '金融保險', color: '#f59e0b' }, '2891': { category: '金融保險', color: '#f59e0b' }, '2603': { category: '航運鋼鐵塑化', color: '#8b5cf6' }, '2002': { category: '航運鋼鐵塑化', color: '#8b5cf6' }, '1301': { category: '航運鋼鐵塑化', color: '#8b5cf6' },
             'AAPL': { category: '美股科技巨頭', color: '#ec4899' }, 'MSFT': { category: '美股科技巨頭', color: '#ec4899' }, 'NVDA': { category: '美股科技巨頭', color: '#ec4899' }, 'GOOGL': { category: '美股科技巨頭', color: '#ec4899' }, 'AMZN': { category: '美股科技巨頭', color: '#ec4899' }, 'META': { category: '美股科技巨頭', color: '#ec4899' }, 'AMD': { category: '美股科技巨頭', color: '#ec4899' }, 'INTC': { category: '美股科技巨頭', color: '#ec4899' }, 'AVGO': { category: '美股科技巨頭', color: '#ec4899' }, 'NFLX': { category: '美股科技巨頭', color: '#ec4899' },
             'TSLA': { category: '電動車與能源', color: '#10b981' }, 'SPY': { category: '大盤型 ETF', color: '#8b5cf6' }, 'QQQ': { category: '大盤型 ETF', color: '#8b5cf6' },
-            '0050': { category: '大盤型 ETF', color: '#8b5cf6' }, '006208': { category: '大盤型 ETF', color: '#8b5cf6' }, '00631L': { category: '槓桿與反向 ETF', color: '#ef4444' }, '00632R': { category: '槓桿與反向 ETF', color: '#ef4444' }, '0056': { category: '高息型 ETF', color: '#ec4899' }, '00878':{ category: '高息型 ETF', color: '#ec4899' }, '00919':{ category: '高息型 ETF', color: '#ec4899' }, '00929':{ category: '高息型 ETF', color: '#ec4899' }, '00713':{ category: '高息型 ETF', color: '#ec4899' }, '00939':{ category: '高息型 ETF', color: '#ec4899' }, '00940':{ category: '高息型 ETF', color: '#ec4899' },
+            '0050': { category: '大盤型 ETF', color: '#8b5cf6' }, '006208': { category: '大盤型 ETF', color: '#8b5cf6' }, '00631L': { category: '槓桿與反向 ETF', color: '#ef4444' }, '00632R': { category: '槓桿與反向 ETF', color: '#ef4444' }, '0056': { category: '高息型 ETF', color: '#ec4899' }, '00878':{ category: '高息型 ETF', color: '#ec4899' }, '00919':{ category: '高息型 ETF', color: '#ec4899' }, '00929':{ category: '復華台灣科技優息', color: '#2979ff' }, '00713':{ category: '高息型 ETF', color: '#ec4899' }, '00939':{ category: '高息型 ETF', color: '#ec4899' }, '00940':{ category: '高息型 ETF', color: '#ec4899' },
             'USD/TWD':{ category: '外匯與貴金屬', color: '#eab308' }, 'JPY/TWD':{ category: '外匯與貴金屬', color: '#eab308' }, 'EUR/TWD':{ category: '外匯與貴金屬', color: '#eab308' }, 'EUR/USD':{ category: '外匯與貴金屬', color: '#eab308' }, 'GBP/USD':{ category: '外匯與貴金屬', color: '#eab308' }, 'GOLD': { category: '外匯與貴金屬', color: '#eab308' }, 'SILVER': { category: '外匯與貴金屬', color: '#eab308' }, 'OIL': { category: '原油能源', color: '#10b981' }
         };
         const TW_STOCKS = [ {id:'2330',name:'台積電'},{id:'2317',name:'鴻海'},{id:'2454',name:'聯發科'},{id:'2881',name:'富邦金'}, {id:'2308',name:'台達電'},{id:'2891',name:'中信金'},{id:'2603',name:'長榮'},{id:'2382',name:'廣達'}, {id:'3231',name:'緯創'},{id:'2357',name:'華碩'},{id:'1301',name:'台塑'},{id:'2002',name:'中鋼'} ];
@@ -631,13 +747,19 @@
             document.getElementById('assetCounter').innerText=`已選: ${selectedAssets.length} / ${maxLimit}`; const grid=document.getElementById('chartsGrid'); const cids=selectedAssets.map(a=>a.id);
             Array.from(grid.children).forEach(card=>{ const id=card.getAttribute('data-id'); if(!cids.includes(id)){ grid.removeChild(card); if(chartInstances[id]){chartInstances[id].remove();delete chartInstances[id];} } });
             
-            selectedAssets.forEach(asset=>{
-                let card=document.getElementById(`card-${asset.id}`);
+            selectedAssets.forEach(asset => {
+                let card = document.getElementById(`card-${asset.id}`);
                 if(!card){
-                    card=document.createElement('div'); card.className='chart-card'; card.id=`card-${asset.id}`; card.setAttribute('data-id',asset.id);
-                    card.innerHTML=`<div class="chart-header"><div class="header-left-zone"><div class="title-row"><span class="chart-badge">${asset.id}</span><div class="chart-title">${asset.name}</div></div></div><div class="header-right-zone"><div class="btn-row"><select class="indicator-select" onchange="changeIndicator('${asset.id}', this.value)"><option value="MA">均線 (MA)</option><option value="BB">布林通道 (BB)</option><option value="KC">肯特納通道 (KC)</option><option value="PC">價格通道 (PC)</option></select><div class="param-inputs"><input type="number" class="indicator-param" id="param1-${asset.id}" value="20" title="週期 (如20日)" onchange="updateIndicatorParams('${asset.id}')"><input type="number" class="indicator-param" id="param2-${asset.id}" value="2" title="倍數 (如2倍標準差)" step="0.1" onchange="updateIndicatorParams('${asset.id}')" style="display:none;"></div><div class="header-pnl-box" id="header-pnl-${asset.id}"></div><button class="remove-btn" onclick="removeAsset('${asset.id}')" title="移除此圖表">✕</button></div></div></div><div class="info-panel" id="info-panel-${asset.id}">載入中...</div><div class="ma-legend" id="ma-legend-${asset.id}"></div><div class="chart-container" id="chart-container-${asset.id}"></div><div class="x-axis-controls"><div class="time-selector"><button class="time-btn" onclick="changeInterval('${asset.id}','15m',this)">15分</button><button class="time-btn" onclick="changeInterval('${asset.id}','30m',this)">30分</button><button class="time-btn" onclick="changeInterval('${asset.id}','1h',this)">1小時</button><button class="time-btn active" onclick="changeInterval('${asset.id}','1d',this)">日線</button><button class="time-btn" onclick="changeInterval('${asset.id}','1wk',this)">周線</button></div></div>`;
+                    card = document.createElement('div'); card.className = 'chart-card'; card.id = `card-${asset.id}`; card.setAttribute('data-id', asset.id);
+                    
+                    // 讀取已經儲存的警報值
+                    const alertVal = priceAlerts[asset.id] ? priceAlerts[asset.id].target : '';
+                    
+                    // 這裡整合了舒服不刺眼的灰白色參數欄，以及最右邊的金黃色警報輸入框 🔔
+                    card.innerHTML = `<div class="chart-header"><div class="header-left-zone"><div class="title-row"><span class="chart-badge">${asset.id}</span><div class="chart-title">${asset.name}</div></div></div><div class="header-right-zone"><div class="btn-row"><select class="indicator-select" onchange="changeIndicator('${asset.id}', this.value)"><option value="MA">均線 (MA)</option><option value="BB">布林通道 (BB)</option><option value="KC">肯特納通道 (KC)</option><option value="PC">價格通道 (PC)</option></select><div class="param-inputs"><input type="number" class="indicator-param" id="param1-${asset.id}" value="20" title="週期" onchange="updateIndicatorParams('${asset.id}')"><input type="number" class="indicator-param" id="param2-${asset.id}" value="2" title="倍數" step="0.1" onchange="updateIndicatorParams('${asset.id}')" style="display:none;"><input type="number" class="indicator-param alert-input" id="alert-${asset.id}" value="${alertVal}" placeholder="🔔 警報價" title="當前報價觸及此金額時，會發送 Gmail 通知你喔" onchange="updatePriceAlertValue('${asset.id}')"></div><div class="header-pnl-box" id="header-pnl-${asset.id}"></div><button class="remove-btn" onclick="removeAsset('${asset.id}')" title="移除此圖表">✕</button></div></div></div><div class="info-panel" id="info-panel-${asset.id}">載入中...</div><div class="ma-legend" id="ma-legend-${asset.id}"></div><div class="chart-container" id="chart-container-${asset.id}"></div><div class="x-axis-controls"><div class="time-selector"><button class="time-btn" onclick="changeInterval('${asset.id}','15m',this)">15分</button><button class="time-btn" onclick="changeInterval('${asset.id}','30m',this)">30分</button><button class="time-btn" onclick="changeInterval('${asset.id}','1h',this)">1小時</button><button class="time-btn active" onclick="changeInterval('${asset.id}','1d',this)">日線</button><button class="time-btn" onclick="changeInterval('${asset.id}','1wk',this)">周線</button></div></div>`;
                     grid.appendChild(card);
-                    setTimeout(()=>{ const container=document.getElementById('chart-container-'+asset.id); if(container){ const chart = CustomMiniChart.createChart(container,asset.id); chartInstances[asset.id] = chart; chart.loadRealData(asset.type, '1d').then(() => refreshDashboardBackend()); } }, 10);
+                    
+                    setTimeout(() => { const container = document.getElementById('chart-container-'+asset.id); if(container){ const chart = CustomMiniChart.createChart(container, asset.id); chartInstances[asset.id] = chart; chart.loadRealData(asset.type, '1d').then(() => refreshDashboardBackend()); } }, 10);
                 }
             });
             refreshDashboardBackend();
