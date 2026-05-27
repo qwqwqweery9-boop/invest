@@ -26,9 +26,7 @@
         body { background-color: var(--bg-color); color: var(--text-color); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 12px; font-size: 16px; overflow-x: hidden; }
         @media (min-width: 768px) { body { padding: 20px; } }
 
-        .theme-toggle-btn, .group-select, .group-action-btn, .search-input, .trade-type-select, .cost-field, .action-btn { 
-            border-radius: 8px; outline: none; transition: 0.2s; 
-        }
+        .theme-toggle-btn, .group-select, .group-action-btn, .search-input, .trade-type-select, .cost-field, .action-btn { border-radius: 8px; outline: none; transition: 0.2s; }
         .theme-toggle-btn { background: var(--panel-bg); border: 1px solid var(--border-color); color: var(--text-color); font-size: 20px; padding: 8px 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .theme-toggle-btn:hover { border-color: var(--primary-blue); transform: translateY(-2px); }
         .control-panel { background-color: var(--panel-bg); border-radius: 12px; padding: 20px; margin-bottom: 24px; border: 1px solid var(--border-color); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
@@ -77,7 +75,6 @@
         .chart-badge { background: var(--bg-color); color: var(--text-secondary); font-size: 13px; padding: 4px 8px; border-radius: 6px; font-family: monospace; border: 1px solid var(--border-color); }
         .header-right-zone { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
         
-        /* 修正按鈕列太擠的問題，把 gap 拉大 */
         .btn-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;}
         
         .indicator-select { background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 6px; font-size: 13px; font-weight: normal; outline: none; cursor: pointer; transition: 0.2s; }
@@ -88,11 +85,9 @@
         .indicator-param { width: 45px; padding: 2px 4px; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); font-weight: normal; border-radius: 4px; font-size: 13px; text-align: center; outline: none; transition: 0.2s; }
         .indicator-param:focus { border-color: var(--text-secondary); box-shadow: 0 0 0 2px rgba(154, 162, 181, 0.2); }
         
-        /* 稍微拉寬警報框 */
         .indicator-param.alert-input { width: 85px; padding: 2px 6px; border-color: rgba(234, 179, 8, 0.3); color: var(--alert-gold); }
         .indicator-param.alert-input:focus { border-color: var(--alert-gold); box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.2); }
 
-        /* 拉開刪除按鈕距離 */
         .remove-btn { background: none; border: none; color: var(--text-secondary); font-size: 20px; cursor: pointer; font-weight: bold; margin-left: 12px; }
         .remove-btn:hover { color: var(--bull-color); }
 
@@ -198,13 +193,12 @@
     <div class="custom-modal-overlay" id="settingsModal">
         <div class="custom-modal-box">
             <div class="custom-modal-title">⚙️ 系統設定</div>
-            <div class="custom-modal-msg">請輸入您的 LINE Notify Token，設定後價格警報將自動發送至您的 LINE。</div>
+            <div class="custom-modal-msg">設定後，價格警報將自動發送至指定信箱。</div>
             <div style="margin-bottom: 12px;">
-                <label class="form-label">LINE Notify Token</label>
-                <input type="password" id="lineTokenInput" class="custom-modal-input" placeholder="貼上 Token" style="display:block; width:100%; margin-bottom: 0;">
-                <a href="https://notify-bot.line.me/zh_TW/" target="_blank" style="font-size: 12px; color: var(--primary-blue); text-decoration: none; display: block; margin-top: 6px;">👉 點此前往申請 LINE Token</a>
+                <label class="form-label">接收警報的 Email</label>
+                <input type="email" id="userEmailInput" class="custom-modal-input" placeholder="example@gmail.com" style="display:block; width:100%; margin-bottom: 15px;">
             </div>
-            <div class="custom-modal-actions" style="margin-top: 20px;">
+            <div class="custom-modal-actions">
                 <button class="modal-btn modal-btn-cancel" onclick="closeSettingsModal()">取消</button>
                 <button class="modal-btn modal-btn-confirm" onclick="saveSettings()">儲存設定</button>
             </div>
@@ -361,21 +355,20 @@
             modal.classList.add('show');
         }
 
-        // ====== 系統設定 (LINE Token) ======
+        // ====== 系統設定 (Email) ======
         function openSettingsModal() { 
             document.getElementById('settingsModal').classList.add('show'); 
-            const savedToken = localStorage.getItem('userLineToken') || '';
-            document.getElementById('lineTokenInput').value = savedToken;
+            document.getElementById('userEmailInput').value = localStorage.getItem('userAlertEmail') || '';
         }
         function closeSettingsModal() { document.getElementById('settingsModal').classList.remove('show'); }
         function saveSettings() {
-            const token = document.getElementById('lineTokenInput').value.trim();
-            localStorage.setItem('userLineToken', token);
+            const email = document.getElementById('userEmailInput').value.trim();
+            localStorage.setItem('userAlertEmail', email);
             closeSettingsModal();
-            showCustomModal({ type: 'alert', title: '✅ 設定成功', message: 'LINE Notify Token 已儲存至您的瀏覽器！' });
+            showCustomModal({ type: 'alert', title: '✅ 設定成功', message: '接收信箱已更新！' });
         }
 
-        // ====== 價格警報設定邏輯 (改發 LINE) ======
+        // ====== 價格警報設定邏輯 (改發 Email) ======
         let priceAlerts = JSON.parse(localStorage.getItem('userPriceAlerts')) || {};
         window.updatePriceAlertValue = function(id) {
             const val = parseFloat(document.getElementById(`alert-${id}`).value);
@@ -403,23 +396,24 @@
                 alertConfig.triggered = true;
                 localStorage.setItem('userPriceAlerts', JSON.stringify(priceAlerts));
                 
-                const userToken = localStorage.getItem('userLineToken');
-                if(!userToken) {
-                    console.log('警報已觸發，但使用者未設定 LINE Token');
+                const alertEmail = localStorage.getItem('userAlertEmail');
+                if(!alertEmail) {
+                    console.log('警報已觸發，但使用者未設定接收 Email');
                     return;
                 }
 
-                // 呼叫我們自己寫的 API 轉發給 LINE
+                // 發送警報信件
                 try {
-                    await fetch('/api/line', {
+                    await fetch('/api/send-mail', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            token: userToken,
-                            message: `\n🚨 [資產監控警報]\n標的：${id}\n觸發條件：目標價 ${alertConfig.target}\n當前最新價：${currentPrice}\n請盡速回面板確認行情！`
+                            to: alertEmail,
+                            subject: `🚨 [資產警報] ${id} 已觸及目標價！`,
+                            text: `標的：${id}\n觸發條件設定：${alertConfig.target}\n當前最新報價：${currentPrice}\n\n此為系統自動發送，請盡速前往監控面板確認。`
                         })
                     });
-                } catch (err) { console.error("LINE 發送失敗:", err); }
+                } catch (err) { console.error("Email 發送失敗:", err); }
             }
         }
 
@@ -734,7 +728,7 @@
                     
                     const alertVal = priceAlerts[asset.id] ? priceAlerts[asset.id].target : '';
                     
-                    card.innerHTML = `<div class="chart-header"><div class="header-left-zone"><div class="title-row"><span class="chart-badge">${asset.id}</span><div class="chart-title">${asset.name}</div></div></div><div class="header-right-zone"><div class="btn-row"><select class="indicator-select" onchange="changeIndicator('${asset.id}', this.value)"><option value="MA">均線 (MA)</option><option value="BB">布林通道 (BB)</option><option value="KC">肯特納通道 (KC)</option><option value="PC">價格通道 (PC)</option></select><div class="param-inputs"><input type="number" class="indicator-param" id="param1-${asset.id}" value="20" title="週期" onchange="updateIndicatorParams('${asset.id}')"><input type="number" class="indicator-param" id="param2-${asset.id}" value="2" title="倍數" step="0.1" onchange="updateIndicatorParams('${asset.id}')" style="display:none;"><input type="number" class="indicator-param alert-input" id="alert-${asset.id}" value="${alertVal}" placeholder="🔔 警報價" title="當前報價觸及此金額時，會發送 LINE 通知" onchange="updatePriceAlertValue('${asset.id}')"></div><div class="header-pnl-box" id="header-pnl-${asset.id}"></div><button class="remove-btn" onclick="removeAsset('${asset.id}')" title="移除此圖表">✕</button></div></div></div><div class="info-panel" id="info-panel-${asset.id}">載入中...</div><div class="ma-legend" id="ma-legend-${asset.id}"></div><div class="chart-container" id="chart-container-${asset.id}"></div><div class="x-axis-controls"><div class="time-selector"><button class="time-btn" onclick="changeInterval('${asset.id}','15m',this)">15分</button><button class="time-btn" onclick="changeInterval('${asset.id}','30m',this)">30分</button><button class="time-btn" onclick="changeInterval('${asset.id}','1h',this)">1小時</button><button class="time-btn active" onclick="changeInterval('${asset.id}','1d',this)">日線</button><button class="time-btn" onclick="changeInterval('${asset.id}','1wk',this)">周線</button></div></div>`;
+                    card.innerHTML = `<div class="chart-header"><div class="header-left-zone"><div class="title-row"><span class="chart-badge">${asset.id}</span><div class="chart-title">${asset.name}</div></div></div><div class="header-right-zone"><div class="btn-row"><select class="indicator-select" onchange="changeIndicator('${asset.id}', this.value)"><option value="MA">均線 (MA)</option><option value="BB">布林通道 (BB)</option><option value="KC">肯特納通道 (KC)</option><option value="PC">價格通道 (PC)</option></select><div class="param-inputs"><input type="number" class="indicator-param" id="param1-${asset.id}" value="20" title="週期" onchange="updateIndicatorParams('${asset.id}')"><input type="number" class="indicator-param" id="param2-${asset.id}" value="2" title="倍數" step="0.1" onchange="updateIndicatorParams('${asset.id}')" style="display:none;"><input type="number" class="indicator-param alert-input" id="alert-${asset.id}" value="${alertVal}" placeholder="🔔 警報價" title="當前報價觸及此金額時，會發送警報信" onchange="updatePriceAlertValue('${asset.id}')"></div><div class="header-pnl-box" id="header-pnl-${asset.id}"></div><button class="remove-btn" onclick="removeAsset('${asset.id}')" title="移除此圖表">✕</button></div></div></div><div class="info-panel" id="info-panel-${asset.id}">載入中...</div><div class="ma-legend" id="ma-legend-${asset.id}"></div><div class="chart-container" id="chart-container-${asset.id}"></div><div class="x-axis-controls"><div class="time-selector"><button class="time-btn" onclick="changeInterval('${asset.id}','15m',this)">15分</button><button class="time-btn" onclick="changeInterval('${asset.id}','30m',this)">30分</button><button class="time-btn" onclick="changeInterval('${asset.id}','1h',this)">1小時</button><button class="time-btn active" onclick="changeInterval('${asset.id}','1d',this)">日線</button><button class="time-btn" onclick="changeInterval('${asset.id}','1wk',this)">周線</button></div></div>`;
                     grid.appendChild(card);
                     
                     setTimeout(() => { const container = document.getElementById('chart-container-'+asset.id); if(container){ const chart = CustomMiniChart.createChart(container, asset.id); chartInstances[asset.id] = chart; chart.loadRealData(asset.type, '1d').then(() => refreshDashboardBackend()); } }, 10);
