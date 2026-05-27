@@ -368,7 +368,7 @@
             showCustomModal({ type: 'alert', title: '✅ 設定成功', message: '接收信箱已更新！' });
         }
 
-        // ====== 價格警報設定邏輯 (改發 Email) ======
+        // ====== 價格警報設定邏輯 (自動寄信) ======
         let priceAlerts = JSON.parse(localStorage.getItem('userPriceAlerts')) || {};
         window.updatePriceAlertValue = function(id) {
             const val = parseFloat(document.getElementById(`alert-${id}`).value);
@@ -402,7 +402,7 @@
                     return;
                 }
 
-                // 發送警報信件
+                // 呼叫後端 API 發送警報信件
                 try {
                     await fetch('/api/send-mail', {
                         method: 'POST',
