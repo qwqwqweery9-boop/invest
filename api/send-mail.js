@@ -1,4 +1,7 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
+
+// 初始化 Resend，直接抓取環境變數
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -7,58 +10,38 @@ export default async function handler(req, res) {
 
   const { to, subject, text } = req.body;
 
-  // 1. 檢查變數
-  if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) {
-    return res.status(500).json({ error: '伺服器未設定 GMAIL_USER 或 GMAIL_PASS 環境變數' });
+  // 1. 檢查內部密鑰
+  if (!process.env.RESEND_API_KEY) {
+    console.error('環境變數遺失：未設定 RESEND_API_KEY');
+    return res.status(500).json({ error: '伺服器未設定發信金鑰' });
   }
 
   if (!to) {
-    return res.status(400).json({ error: '未提供接收信箱 (to)' });
+    return res.status(400).json({ error: '未提供接收信箱' });
   }
 
-  // 2. 建立發送器（開啟 debug 模式）
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_PASS,
-    },
-    debug: true,   // 顯示詳細 SMTP 連線日誌
-    logger: true   // 將日誌印到伺服器主控台
-  });
-
-  // 3. 嚴格驗證連線狀況
   try {
-    console.log('正在嘗試連接 Gmail SMTP 伺服器...');
-    await transporter.verify();
-    console.log('Gmail SMTP 連線驗證成功！準備寄信...');
-  } catch (verifyError) {
-    console.error('Gmail 連線驗證失敗（通常是帳密或安全鎖問題）:', verifyError);
-    return res.status(500).json({ 
-      error: 'Gmail 驗證失敗', 
-      code: verifyError.code, 
-      command: verifyError.command,
-      message: verifyError.message 
-    });
-  }
-
-  // 4. 執行寄信
-  try {
-    const info = await transporter.sendMail({
-      from: `"資產監控系統" <${process.env.GMAIL_USER}>`,
+    console.log(`正在透過 Resend 發送警報信至: ${to}`);
+    
+    // 2. 呼叫 Resend API 寄信
+    // 免費帳戶預設發件人必須是 onboarding@resend.dev
+    const { data, error } = await resend.emails.send({
+      from: '資產監控系統 <onboarding@resend.dev>',
       to: to,
-      subject: subject || '系統通知',
-      text: text || '無內容',
+      subject: subject || '價格警報通知',
+      text: text || '系統觸發通知',
     });
 
-    console.log('郵件發送成功，MessageID:', info.messageId);
-    return res.status(200).json({ success: true, messageId: info.messageId });
-  } catch (sendError) {
-    console.error('Nodemailer 寄信本體失敗:', sendError);
-    return res.status(500).json({ 
-      error: '寄信失敗', 
-      code: sendError.code,
-      message: sendError.message 
-    });
+    if (error) {
+      console.error('Resend 平台內部發信失敗:', error);
+      return res.status(400).json({ error: '發信失敗', details: error });
+    }
+
+    console.log('Resend 寄信成功，郵件 ID:', data.id);
+    return res.status(200).json({ success: true, messageId: data.id });
+
+  } catch (err) {
+    console.error('伺服器未預期錯誤:', err);
+    return res.status(500).json({ error: '伺服器內部錯誤', message: err.message });
   }
 }
